@@ -1,0 +1,51 @@
+﻿@model HuntFlowWIUT.Web.Models.VacanciesResponse
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";  // or your specific layout
+    ViewData["Title"] = "Available Vacancies";
+}
+
+<div class="container mt-4">
+    <h1 class="text-center mb-4">Available Vacancies</h1>
+
+    @if (Model != null && Model.Items != null && Model.Items.Any())
+    {
+        <div class="row">
+            @foreach (var vacancy in Model.Items)
+            {
+                <div class="col-md-4 col-sm-6 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">@vacancy.Position</h5>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-muted">@vacancy.Company</h6>
+                            <p class="card-text">
+                                <strong>Salary:</strong> @vacancy.Money<br />
+                                <strong>Status:</strong> @vacancy.State<br />
+                                <strong>Priority:</strong> @vacancy.Priority<br />
+                                <strong>Created:</strong> @vacancy.Created.ToLocalTime().ToString("yyyy-MM-dd")
+                            </p>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <a href="@Url.Action("Details", "Vacancies", new { id = vacancy.Id })" class="btn btn-outline-primary btn-sm">View Details</a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <div class="text-center">
+            <p>
+                Page @Model.Page of @Model.TotalPages |
+                Showing @Model.Count vacancies out of @Model.TotalItems
+            </p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info" role="alert">
+            No vacancies available at the moment.
+        </div>
+    }
+</div>
