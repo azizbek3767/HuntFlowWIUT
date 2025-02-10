@@ -12,61 +12,64 @@ namespace HuntFlowWIUT.Web.Services
         private string _accessToken;
         private string _refreshToken;
         private DateTime _accessTokenExpiresAt;
+
         public TokenService(HttpClient httpClient, IConfiguration configuration, ILogger<TokenService> logger)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _logger = logger;
 
-            _accessToken = _configuration["HuntFlow:AccessToken"];
-            _refreshToken = _configuration["HuntFlow:RefreshToken"];
+            _accessToken = _configuration["Huntflow:AccessToken"];
+            _refreshToken = _configuration["Huntflow:RefreshToken"];
+
             _accessTokenExpiresAt = DateTime.UtcNow.AddMinutes(10);
         }
+
         public async Task<string> GetAccessTokenAsync()
         {
-            if(DateTime.UtcNow >= _accessTokenExpiresAt.AddSeconds(-60))
+            if (DateTime.UtcNow >= _accessTokenExpiresAt.AddSeconds(-60))
             {
-                _logger.LogInformation("Access token is expiring, refreshing the token");
+                _logger.LogInformation("Access token is expiring soon; refreshing the token.");
                 await RefreshTokenAsync();
             }
+
             return _accessToken;
         }
 
         public async Task RefreshTokenAsync()
         {
-            var refreshEndpointv = "token/refresh";
+            var refreshEndpoint = "token/refresh";
 
             var requestData = new TokenRefreshRequest
             {
                 RefreshToken = _refreshToken
             };
 
-            var response = await _httpClient.PostAsJsonAsync(refreshEndpointv, requestData);
+            var response = await _httpClient.PostAsJsonAsync(refreshEndpoint, requestData);
 
             if (response.IsSuccessStatusCode)
             {
                 var tokenResponse = await response.Content.ReadFromJsonAsync<TokenRefreshResponse>();
 
-                if (tokenResponse != null) 
+                if (tokenResponse != null)
                 {
                     _accessToken = tokenResponse.AccessToken;
                     _refreshToken = tokenResponse.RefreshToken;
                     _accessTokenExpiresAt = DateTime.UtcNow.AddSeconds(tokenResponse.ExpiresIn);
 
-                    _logger.LogInformation("Token Refreshed successfully. New access token expires in {ExpiresIn} seconds", tokenResponse.ExpiresIn);
+                    _logger.LogInformation("Token refreshed successfully. New access token expires in {ExpiresIn} seconds.", tokenResponse.ExpiresIn);
                 }
                 else
                 {
-                    _logger.LogError("Token refresh response was null");
-                    throw new Exception("Token refresh failed: empty response");
+                    _logger.LogError("Token refresh failed: the token response was null.");
+                    throw new Exception("Token refresh failed: empty response.");
                 }
             }
             else
             {
-                _logger.LogError("Token refresh failed with status code: {StatusCode}", response.StatusCode);
+                _logger.LogError("Token refresh failed with status code: {StatusCode}.", response.StatusCode);
                 throw new Exception($"Token refresh failed with status code: {response.StatusCode}");
             }
-
         }
     }
 }

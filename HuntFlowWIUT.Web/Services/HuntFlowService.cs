@@ -1,79 +1,77 @@
-﻿using HuntFlowWIUT.Web.Models;
+﻿using HuntFlowWIUT.Web.Extensions;
+using HuntFlowWIUT.Web.Models;
+using HuntFlowWIUT.Web.Models.ViewModels;
 using HuntFlowWIUT.Web.Services.Interfaces;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net.Http.Headers;
+using System.Text.Json;
+using static HuntFlowWIUT.Web.Services.Interfaces.IHuntFlowService;
 
 namespace HuntFlowWIUT.Web.Services
 {
-    public class HuntFlowService : IHuntFlowService
+    public class HuntflowService : IHuntflowService
     {
         private readonly HttpClient _httpClient;
         private readonly ITokenService _tokenService;
-        private readonly ILogger<HuntFlowService> _logger;
-        private readonly string _baseUrl;
+        private readonly JsonSerializerOptions _jsonOptions;
 
-        public HuntFlowService(HttpClient httpClient, ITokenService tokenService, IConfiguration configuration, ILogger<HuntFlowService> logger)
+        public HuntflowService(HttpClient httpClient, ITokenService tokenService)
         {
             _httpClient = httpClient;
             _tokenService = tokenService;
-            _logger = logger;
-            _baseUrl = configuration["HuntFlow:BaseUrl"];
+            _jsonOptions = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            _jsonOptions.Converters.Add(new CustomDateTimeConverter("yyyy-MM-dd"));
         }
 
-        public async Task<IEnumerable<Candidate>> GetCandidateAsync()
+        public async Task<VacancyListResponse> GetVacanciesAsync(int accountId, int page = 1, int count = 30)
         {
             var accessToken = await _tokenService.GetAccessTokenAsync();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            var endpoint = $"{_baseUrl}/candidates";
+            var endpoint = $"accounts/{accountId}/vacancies";
+            using var response = await _httpClient.GetAsync(endpoint);
 
-            try
+            if (!response.IsSuccessStatusCode)
             {
-                var candidates = await _httpClient.GetFromJsonAsync<IEnumerable<Candidate>>(endpoint);
-                return candidates;
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Error retrieving vacancies. Status Code: {response.StatusCode}. Response: {errorContent}");
             }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Error fetching candidates from huntflow");
-                throw;
-            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<VacancyListResponse>(content, _jsonOptions);
         }
 
-        public async Task<VacanciesResponse> GetVacanciesAsync(int accountId, int page = 1, int count = 30, bool mine = false, bool opened = false, string[] state = null)
+        public async Task<VacancyDetail> GetVacancyDetailAsync(int accountId, int vacancyId)
         {
             var accessToken = await _tokenService.GetAccessTokenAsync();
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
 
-            string endpoint = $"{_baseUrl}/accounts/{accountId}/vacancies";
+            var endpoint = $"accounts/{accountId}/vacancies/{vacancyId}";
+            using var response = await _httpClient.GetAsync(endpoint);
 
-            var queryParams = new List<KeyValuePair<string, string>>
+            if (!response.IsSuccessStatusCode)
             {
-                new KeyValuePair<string, string>("count", count.ToString()),
-                new KeyValuePair<string, string>("page", page.ToString()),
-                new KeyValuePair<string, string>("mine", mine.ToString().ToLower()),
-                new KeyValuePair<string, string>("opened", opened.ToString().ToLower())
-            };
-
-            if(state != null)
-            {
-                foreach(var s in state)
-                {
-                    queryParams.Add(new KeyValuePair<string, string>("state", s));
-                }
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Error retrieving vacancy details. Status Code: {response.StatusCode}. Response: {errorContent}");
             }
 
-            string url = QueryHelpers.AddQueryString(endpoint, queryParams);
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<VacancyDetail>(content, _jsonOptions);
+        }
 
-            try
+        public async Task<ApplicantDetail> CreateApplicantAsync(int accountId, ApplicantCreationViewModel model)
+        {
+            var accessToken = await _tokenService.GetAccessTokenAsync();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var endpoint = $"accounts/{accountId}/applicants";
+            using var response = await _httpClient.PostAsJsonAsync(endpoint, model, _jsonOptions);
+            if (!response.IsSuccessStatusCode)
             {
-                var vacanciesResponse = await _httpClient.GetFromJsonAsync<VacanciesResponse>(url);
-                return vacanciesResponse;
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Error creating applicant. Status Code: {response.StatusCode}. Response: {errorContent}");
             }
-            catch (HttpRequestException ex)
-            {
-                _logger.LogError(ex, "Error fetching vacancies from huntflow");
-                throw;
-            }
+            var content = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApplicantDetail>(content, _jsonOptions);
         }
     }
 }

@@ -1,0 +1,26 @@
+﻿@model HuntFlowWIUT.Web.Models.ViewModels.VacanciesIndexViewModel
+@{
+    ViewData["Title"] = "Vacancies";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Vacancies</h2>
+    <div class="row">
+        @foreach (var vacancy in Model.Vacancies)
+        {
+            <div class="col-md-4">
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">@vacancy.Position</h5>
+                        <p class="card-text"><strong>Company:</strong> @vacancy.Company</p>
+                        <p class="card-text"><strong>Salary:</strong> @vacancy.Money</p>
+                        <p class="card-text"><strong>Status:</strong> @vacancy.State</p>
+                        <a href="@Url.Action("Details", "Vacancies", new { id = vacancy.Id })" class="btn btn-primary">Read More</a>
+
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+

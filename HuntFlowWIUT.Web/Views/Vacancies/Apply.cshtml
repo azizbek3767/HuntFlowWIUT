@@ -1,0 +1,74 @@
+﻿@model HuntFlowWIUT.Web.Models.ViewModels.ApplicantCreationViewModel
+
+@{
+    ViewData["Title"] = "Apply for Vacancy";
+}
+
+<h2>Apply for Vacancy</h2>
+
+<form asp-action="Apply" method="post">
+    <div class="form-group">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="MiddleName"></label>
+        <input asp-for="MiddleName" class="form-control" />
+        <span asp-validation-for="MiddleName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone"></label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Skype"></label>
+        <input asp-for="Skype" class="form-control" />
+        <span asp-validation-for="Skype" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Position"></label>
+        <input asp-for="Position" class="form-control" readonly />
+        <span asp-validation-for="Position" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Company"></label>
+        <input asp-for="Company" class="form-control" />
+        <span asp-validation-for="Company" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Money"></label>
+        <input asp-for="Money" class="form-control" />
+        <span asp-validation-for="Money" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Birthday"></label>
+        <input asp-for="Birthday" type="date" class="form-control" />
+        <span asp-validation-for="Birthday" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Externals[0].Data.Body">Resume Text</label>
+        <textarea asp-for="Externals[0].Data.Body" class="form-control"></textarea>
+        <span asp-validation-for="Externals[0].Data.Body" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Social[0].Value">Telegram Username</label>
+        <input asp-for="Social[0].Value" class="form-control" />
+        <span asp-validation-for="Social[0].Value" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Application</button>
+</form>

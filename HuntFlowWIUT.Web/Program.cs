@@ -1,22 +1,24 @@
 using HuntFlowWIUT.Web.Controllers;
 using HuntFlowWIUT.Web.Services;
 using HuntFlowWIUT.Web.Services.Interfaces;
+using static HuntFlowWIUT.Web.Services.Interfaces.IHuntFlowService;
 
 var builder = WebApplication.CreateBuilder(args);
+var configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient<ITokenService, TokenService>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["HuntFlow:BaseUrl"]);
+    client.BaseAddress = new Uri(configuration["Huntflow:BaseUrl"]);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
-builder.Services.AddHttpClient<IHuntFlowService, HuntFlowService>(client =>
+builder.Services.AddHttpClient<IHuntflowService, HuntflowService>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["HuntFlow:BaseUrl"]);
-    client.DefaultRequestHeaders.Accept.Add(
-        new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+    client.BaseAddress = new Uri(configuration["Huntflow:BaseUrl"]);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
 
 var app = builder.Build();

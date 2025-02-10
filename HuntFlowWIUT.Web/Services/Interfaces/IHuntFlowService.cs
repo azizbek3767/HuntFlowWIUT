@@ -1,17 +1,17 @@
 ﻿using HuntFlowWIUT.Web.Models;
+using HuntFlowWIUT.Web.Models.ViewModels;
 
 namespace HuntFlowWIUT.Web.Services.Interfaces
 {
     public interface IHuntFlowService
     {
-        Task<IEnumerable<Candidate>> GetCandidateAsync();
+        public interface IHuntflowService
+        {
+            Task<Models.VacancyListResponse> GetVacanciesAsync(int accountId, int page = 1, int count = 30);
+            Task<Models.VacancyDetail> GetVacancyDetailAsync(int accountId, int vacancyId);
+            Task<ApplicantDetail> CreateApplicantAsync(int accountId, ApplicantCreationViewModel model);
+        }
 
-        Task<VacanciesResponse> GetVacanciesAsync(
-            int accountId,
-            int page = 1,
-            int count = 30,
-            bool mine = false,
-            bool opened = false,
-            string[] state = null);
+
     }
 }

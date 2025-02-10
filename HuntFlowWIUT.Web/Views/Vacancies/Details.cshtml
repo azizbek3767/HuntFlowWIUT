@@ -1,0 +1,41 @@
+﻿@model HuntFlowWIUT.Web.Models.VacancyDetail
+
+@{
+    ViewData["Title"] = Model.Position;
+}
+
+
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h2 class="card-title">@Model.Position</h2>
+            <p><strong>Company:</strong> @Model.Company</p>
+            <p><strong>Salary:</strong> @Model.Money</p>
+            <p><strong>Status:</strong> @Model.State</p>
+            <hr />
+            <h4>Details</h4>
+            <div>@Html.Raw(Model.Body)</div>
+            <hr />
+            <h4>Requirements</h4>
+            <div>@Html.Raw(Model.Requirements)</div>
+            <hr />
+            <h4>Conditions</h4>
+            <div>@Html.Raw(Model.Conditions)</div>
+            @if (Model.Files != null && Model.Files.Any())
+            {
+                <hr />
+                <h4>Attachments</h4>
+                <ul>
+                    @foreach (var file in Model.Files)
+                    {
+                        <li><a href="@file.Url" target="_blank">@file.Name</a></li>
+                    }
+                </ul>
+            }
+            <div class="mt-4">
+                <a href="@Url.Action("Apply", "Vacancies", new { id = Model.Id })" class="btn btn-success">Apply</a>
+            </div>
+        </div>
+        
+    </div>
+</div>
