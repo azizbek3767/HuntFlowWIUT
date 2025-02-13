@@ -1,0 +1,140 @@
+﻿@* @model HuntFlowWIUT.Web.Models.ViewModels.ApplicantCreationViewModel
+
+@{
+    ViewData["Title"] = "Apply for Vacancy";
+    // Ensure you have the correct accountId and auth token available, e.g., via ViewBag.
+    var accountId = ViewBag.AccountId ?? "3360";
+    var authToken = ViewBag.AuthToken ?? "e0bcebb6112ca03573e8011a81bddf709538404d5749ed9d105b640bed60163c"; // Set this in your controller if needed.
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<h2>Apply for Vacancy</h2>
+
+<form asp-action="Apply" method="post" id="applicantForm">
+    <div class="form-group">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="MiddleName"></label>
+        <input asp-for="MiddleName" class="form-control" />
+        <span asp-validation-for="MiddleName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Phone"></label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Skype"></label>
+        <input asp-for="Skype" class="form-control" />
+        <span asp-validation-for="Skype" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Position"></label>
+        <input asp-for="Position" class="form-control" readonly />
+        <span asp-validation-for="Position" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Company"></label>
+        <input asp-for="Company" class="form-control" />
+        <span asp-validation-for="Company" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Money"></label>
+        <input asp-for="Money" class="form-control" />
+        <span asp-validation-for="Money" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Birthday"></label>
+        <input asp-for="Birthday" type="text" class="form-control" placeholder="Select your birthday" />
+        <span asp-validation-for="Birthday" class="text-danger"></span>
+    </div>
+
+    <!-- Resume (External) Section -->
+
+    <h4>Resume Details</h4>
+    <div class="form-group">
+        <label asp-for="Externals[0].Data.Body">Resume Text</label>
+        <textarea asp-for="Externals[0].Data.Body" class="form-control"></textarea>
+        <span asp-validation-for="Externals[0].Data.Body" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="resumeFile">Upload Resume File</label>
+        <input type="file" id="resumeFile" name="resumeFile" class="form-control" />
+        <!-- Hidden input for binding the uploaded file's ID to the first external resume's Files list -->
+        <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="" />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Social[0].Value">Telegram Username</label>
+        <input asp-for="Social[0].Value" class="form-control" />
+        <span asp-validation-for="Social[0].Value" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Application</button>
+</form>
+
+<!-- Include jQuery and toastr JS (if not already included in your layout) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        // Attach flatpickr to the birthday input
+        flatpickr("#Birthday", {
+            dateFormat: "Y-m-d",
+            // Optionally, you can set additional options here, e.g., maxDate, minDate, etc.
+            maxDate: "today"
+        });
+    });
+
+    $(document).ready(function () {
+        $("#resumeFile").on("change", function () {
+            var file = this.files[0];
+            console.log(file);
+            if (file) {
+                var formData = new FormData();
+                formData.append("file", file);
+
+                var accountId = '@(ViewBag.AccountId ?? "3360")';
+                var proxyUrl = '/api/proxy/upload?accountId=' + accountId;
+
+                $.ajax({
+                    url: proxyUrl,
+                    type: 'POST',
+                    headers: {
+                        // "Authorization": "Bearer " + authToken, // Remove this for testing if not required by your proxy
+                        "X-File-Parse": "true"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log("Upload response:", response);
+                        $("#ExternalFileId").val(response.id);
+                        toastr.success("File uploaded successfully.");
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("Upload error:", textStatus, errorThrown);
+                        toastr.error("Error uploading file.");
+                    }
+                });
+            }
+        });
+    });
+</script>
+ *@

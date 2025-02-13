@@ -1,6 +1,10 @@
 using HuntFlowWIUT.Web.Controllers;
+using HuntFlowWIUT.Web.Extensions;
 using HuntFlowWIUT.Web.Services;
 using HuntFlowWIUT.Web.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using static HuntFlowWIUT.Web.Services.Interfaces.IHuntFlowService;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,6 +12,8 @@ var configuration = builder.Configuration;
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<ICountryService, CountryService>();
 
 builder.Services.AddHttpClient<ITokenService, TokenService>(client =>
 {

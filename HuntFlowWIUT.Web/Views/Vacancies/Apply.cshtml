@@ -1,74 +1,681 @@
 ﻿@model HuntFlowWIUT.Web.Models.ViewModels.ApplicantCreationViewModel
 
 @{
-    ViewData["Title"] = "Apply for Vacancy";
+    ViewData["Title"] = "Apply for Vacancy - Type Admin";
+    // Assume ViewBag.Countries contains a list of SelectListItem for Citizenship
+    var countries = ViewBag.Countries as IEnumerable<SelectListItem>;
+    //var countries = Model.Countries;
+    var accountId = ViewBag.AccountId ?? "3360";
+    var authToken = ViewBag.AuthToken ?? "8bd848677a936963960c5b88b78100d76e1dfc494476f320d7ce2344b5ab71c9";
 }
 
-<h2>Apply for Vacancy</h2>
+<h2>Application Form</h2>
+<!-- Display global validation summary -->
+@Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-<form asp-action="Apply" method="post">
-    <div class="form-group">
-        <label asp-for="FirstName"></label>
-        <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger"></span>
+@if (ViewBag.ErrorList != null)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewBag.ErrorList as List<string>)
+            {
+                <li>@error</li>
+            }
+        </ul>
     </div>
+}
+
+<!-- Optionally, display a TempData error message if present -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+}
+<form asp-action="Apply" method="post" enctype="multipart/form-data" id="applicationForm">
+    <!-- Basic Info Section -->
     <div class="form-group">
-        <label asp-for="LastName"></label>
-        <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="MiddleName"></label>
-        <input asp-for="MiddleName" class="form-control" />
-        <span asp-validation-for="MiddleName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Phone"></label>
-        <input asp-for="Phone" class="form-control" />
-        <span asp-validation-for="Phone" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Skype"></label>
-        <input asp-for="Skype" class="form-control" />
-        <span asp-validation-for="Skype" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="Position"></label>
+        <label>Position applied for*</label>
         <input asp-for="Position" class="form-control" readonly />
         <span asp-validation-for="Position" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Company"></label>
-        <input asp-for="Company" class="form-control" />
-        <span asp-validation-for="Company" class="text-danger"></span>
+        <label>First Name*</label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Money"></label>
-        <input asp-for="Money" class="form-control" />
-        <span asp-validation-for="Money" class="text-danger"></span>
+        <label>Last Name*</label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="Birthday"></label>
+        <label>Date of birth*</label>
         <input asp-for="Birthday" type="date" class="form-control" />
         <span asp-validation-for="Birthday" class="text-danger"></span>
     </div>
-
     <div class="form-group">
-        <label asp-for="Externals[0].Data.Body">Resume Text</label>
-        <textarea asp-for="Externals[0].Data.Body" class="form-control"></textarea>
-        <span asp-validation-for="Externals[0].Data.Body" class="text-danger"></span>
+        <label>Place of birth*</label>
+        <input asp-for="PlaceOfBirth" class="form-control" />
+        <span asp-validation-for="PlaceOfBirth" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Citizenship*</label>
+        <select asp-for="CitizenshipId" class="form-control" asp-items="Model.Countries">
+            <option value="">Select a country</option>
+        </select>
+        <span asp-validation-for="CitizenshipId" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="Social[0].Value">Telegram Username</label>
-        <input asp-for="Social[0].Value" class="form-control" />
+        <label>Contact telephone numbers*</label>
+        <input asp-for="Phone" class="form-control" />
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>E-mail Address*</label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Photo</label>
+        <input type="file" asp-for="PhotoFile" class="form-control" accept="image/*" />
+        <span asp-validation-for="PhotoFile" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>How did you hear about this vacancy?</label>
+        <input asp-for="HowDidYouHear" class="form-control" />
+        <span asp-validation-for="HowDidYouHear" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Social networking profiles (if applicable):</label>
+        <input asp-for="SocialProfiles" class="form-control" />
+        <span asp-validation-for="SocialProfiles" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Have you ever been convicted of a crime?*</label>
+        <select asp-for="Convicted" class="form-control">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+        </select>
+        <span asp-validation-for="Convicted" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Are you currently working at WIUT?*</label>
+        <select asp-for="CurrentlyWorkingAtWIUT" class="form-control">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+        </select>
+        <span asp-validation-for="CurrentlyWorkingAtWIUT" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Have you applied for any position at WIUT before?*</label>
+        <select asp-for="AppliedBeforeAtWIUT" class="form-control">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+        </select>
+        <span asp-validation-for="AppliedBeforeAtWIUT" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Do you have relatives who are currently employed at WIUT?*</label>
+        <select asp-for="HasRelativesAtWIUT" class="form-control">
+            <option value="false">No</option>
+            <option value="true">Yes</option>
+        </select>
+        <span asp-validation-for="HasRelativesAtWIUT" class="text-danger"></span>
+    </div>
+
+    <!-- Employment Section -->
+    <hr />
+    <h3>Employment Section</h3>
+    <div id="employmentSection">
+        <div class="employment-block card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Employment Block 1</h5>
+                <div class="form-group">
+                    <label>From date</label>
+                    <input type="date" name="EmploymentBlocks[0].FromDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>To date</label>
+                    <input type="date" name="EmploymentBlocks[0].ToDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Full or Part Time</label>
+                    <select name="EmploymentBlocks[0].FullOrPartTime" class="form-control">
+                        <option value="Full">Full</option>
+                        <option value="Part">Part</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Name of Employer (Institution)</label>
+                    <input type="text" name="EmploymentBlocks[0].EmployerName" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Position in Organisation</label>
+                    <input type="text" name="EmploymentBlocks[0].PositionInOrg" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Summary of main duties</label>
+                    <textarea name="EmploymentBlocks[0].MainDuties" class="form-control"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Name and contacts of Supervisor</label>
+                    <input type="text" name="EmploymentBlocks[0].SupervisorInfo" class="form-control" />
+                </div>
+                <!-- No delete button for the first block -->
+            </div>
+        </div>
+    </div>
+    <button type="button" id="addEmployment" class="btn btn-secondary">Add more employment</button>
+
+    <!-- Supervisor contact checkbox -->
+    <div class="form-group form-check">
+        <input type="checkbox" asp-for="AllowSupervisorContact" class="form-check-input" />
+        <label asp-for="AllowSupervisorContact" class="form-check-label">
+            Please tick if you do not mind your supervisors to be contacted by HR Department as part of the reference check.
+        </label>
+    </div>
+
+    <!-- Education Section -->
+    <hr />
+    <h3>Education and Qualifications</h3>
+    <div id="educationSection">
+        <div class="education-block card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Education Block 1</h5>
+                <div class="form-group">
+                    <label>From date</label>
+                    <input type="date" name="EducationBlocks[0].FromDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>To date</label>
+                    <input type="date" name="EducationBlocks[0].ToDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Full or Part Time</label>
+                    <select name="EducationBlocks[0].FullOrPartTime" class="form-control">
+                        <option value="Full">Full</option>
+                        <option value="Part">Part</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Name of Institution, place and country</label>
+                    <input type="text" name="EducationBlocks[0].InstitutionInfo" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Qualifications</label>
+                    <input type="text" name="EducationBlocks[0].Qualifications" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" id="addEducation" class="btn btn-secondary">Add more education</button>
+
+    <!-- Practical Training Section -->
+    <hr />
+    <h3>Practical Training</h3>
+    <div id="practicalTrainingSection">
+        <div class="practical-block card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Practical Training Block 1</h5>
+                <div class="form-group">
+                    <label>From date</label>
+                    <input type="date" name="PracticalTrainingBlocks[0].FromDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>To date</label>
+                    <input type="date" name="PracticalTrainingBlocks[0].ToDate" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Name of Organisation</label>
+                    <input type="text" name="PracticalTrainingBlocks[0].OrganisationName" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Qualification / Certification</label>
+                    <input type="text" name="PracticalTrainingBlocks[0].Certification" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" id="addPracticalTraining" class="btn btn-secondary">Add more practical training</button>
+
+    <!-- Languages Section -->
+    <hr />
+    <h3>Languages</h3>
+    <div id="languageSection">
+        <div class="language-block card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">Language Block 1</h5>
+                <div class="form-group">
+                    <label>Language name</label>
+                    <input type="text" name="LanguageBlocks[0].LanguageName" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Reading (1-5)</label>
+                    <select name="LanguageBlocks[0].Reading" class="form-control">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Writing (1-5)</label>
+                    <select name="LanguageBlocks[0].Writing" class="form-control">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Speaking (1-5)</label>
+                    <select name="LanguageBlocks[0].Speaking" class="form-control">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <option value="@i">@i</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button type="button" id="addLanguage" class="btn btn-secondary">Add more languages</button>
+
+    <!-- Additional Fields -->
+    <hr />
+    <div class="form-group">
+        <label>Resume Upload (PDF file)</label>
+        <input type="file" id="resumeUpload" name="ResumeFile" class="form-control" accept=".pdf" />
+        <span asp-validation-for="ResumeFile" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>What is your motivation to join us?</label>
+        <textarea asp-for="Motivation" class="form-control"></textarea>
+        <span asp-validation-for="Motivation" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>What specific skills do you possess that are relevant for the position?</label>
+        <textarea asp-for="SpecificSkills" class="form-control"></textarea>
+        <span asp-validation-for="SpecificSkills" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label>Is there anything else you’d like to share to support your application?</label>
+        <textarea asp-for="AdditionalInfo" class="form-control"></textarea>
+        <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="socialProfile">Social networking profiles (if applicable):</label>
+        <input type="text" id="socialProfile" name="Social[0].Value" class="form-control" />
         <span asp-validation-for="Social[0].Value" class="text-danger"></span>
     </div>
+    <div class="form-group form-check">
+        <input type="checkbox" asp-for="Declaration" class="form-check-input" />
+        <label asp-for="Declaration" class="form-check-label">I declare that the information provided on this application form is true and correct to the best of my knowledge.</label>
+        <span asp-validation-for="Declaration" class="text-danger"></span>
+    </div>
+    <input type="hidden" asp-for="SubmissionDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+
+    <!-- Hidden fields for merged data and external resume -->
+    <!-- MergedApplicationData will be computed by JS and set into Externals[0].Data.Body -->
+    <input type="hidden" asp-for="MergedApplicationData" id="MergedDataHidden" />
+    <!-- External resume file ID from resume upload -->
+    <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="" />
 
     <button type="submit" class="btn btn-primary">Submit Application</button>
 </form>
+
+<!-- Include jQuery and toastr JS (if not already included in your layout) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+@* <script type="text/javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        // Attach flatpickr to the birthday input
+        flatpickr("#Birthday", {
+            dateFormat: "Y-m-d",
+            // Optionally, you can set additional options here, e.g., maxDate, minDate, etc.
+            maxDate: "today"
+        });
+    });
+
+    $(document).ready(function () {
+        $("#resumeFile").on("change", function () {
+            var file = this.files[0];
+            console.log(file);
+            if (file) {
+                var formData = new FormData();
+                formData.append("file", file);
+
+                var accountId = '@(ViewBag.AccountId ?? "3360")';
+                var proxyUrl = '/api/proxy/upload?accountId=' + accountId;
+
+                $.ajax({
+                    url: proxyUrl,
+                    type: 'POST',
+                    headers: {
+                        // "Authorization": "Bearer " + authToken, // Remove this for testing if not required by your proxy
+                        "X-File-Parse": "true"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log("Upload response:", response);
+                        $("#ExternalFileId").val(response.id);
+                        toastr.success("File uploaded successfully.");
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("Upload error:", textStatus, errorThrown);
+                        toastr.error("Error uploading file.");
+                    }
+                });
+            }
+        });
+    });
+
+    // Dynamic add-more functionality for employment (example shown)
+    var employmentCount = 1;
+    $("#addEmployment").click(function () {
+        if (employmentCount < 10) {
+            var newBlock = $(".employment-block").first().clone();
+            newBlock.find("input, select, textarea").each(function () {
+                var name = $(this).attr("name");
+                if (name) {
+                    $(this).attr("name", name.replace("EmploymentBlocks[0]", "EmploymentBlocks[" + employmentCount + "]"));
+                }
+                $(this).val("");
+            });
+            // Append a delete button if not present
+            if (!newBlock.find(".deleteEmployment").length) {
+                newBlock.append('<button type="button" class="btn btn-danger deleteEmployment">Delete</button>');
+            }
+            $("#employmentSection").append(newBlock);
+            employmentCount++;
+        }
+    });
+    $(document).on("click", ".deleteEmployment", function () {
+        $(this).closest(".employment-block").remove();
+        employmentCount--;
+    });
+
+    // Similar dynamic functionality can be added for education, practical training, and language sections.
+
+    // Merge form data into one big string on form submit (excluding PhotoFile and ResumeFile)
+    $("#applicationForm").on("submit", function () {
+        var merged = "";
+        merged += "Position applied for: " + $("input[name='Position']").val() + "\n";
+        merged += "First Name: " + $("input[name='FirstName']").val() + "\n";
+        merged += "Last Name: " + $("input[name='LastName']").val() + "\n";
+        merged += "Date of birth: " + $("input[name='Birthday']").val() + "\n";
+        merged += "Place of birth: " + $("input[name='PlaceOfBirth']").val() + "\n";
+        merged += "Citizenship: " + $("select[name='CitizenshipId']").val() + "\n";
+        merged += "Contact telephone numbers: " + $("input[name='Phone']").val() + "\n";
+        merged += "E-mail Address: " + $("input[name='Email']").val() + "\n";
+        merged += "How did you hear about this vacancy?: " + $("input[name='HowDidYouHear']").val() + "\n";
+        merged += "Social networking profiles: " + $("input[name='SocialProfiles']").val() + "\n";
+        merged += "Convicted: " + $("select[name='Convicted']").val() + "\n";
+        merged += "Currently working at WIUT: " + $("select[name='CurrentlyWorkingAtWIUT']").val() + "\n";
+        merged += "Applied before at WIUT: " + $("select[name='AppliedBeforeAtWIUT']").val() + "\n";
+        merged += "Relatives employed at WIUT: " + $("select[name='HasRelativesAtWIUT']").val() + "\n";
+
+        // Employment blocks merging
+        $(".employment-block").each(function (index) {
+            merged += "Employment Block " + (index + 1) + ":\n";
+            merged += "  From: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.FromDate']").val() + "\n";
+            merged += "  To: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.ToDate']").val() + "\n";
+            merged += "  Full/Part Time: " + $(this).find("select[name^='EmploymentBlocks']").filter("[name$='.FullOrPartTime']").val() + "\n";
+            merged += "  Employer: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.EmployerName']").val() + "\n";
+            merged += "  Position: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.PositionInOrg']").val() + "\n";
+            merged += "  Duties: " + $(this).find("textarea[name^='EmploymentBlocks']").filter("[name$='.MainDuties']").val() + "\n";
+            merged += "  Supervisor: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.SupervisorInfo']").val() + "\n";
+        });
+        // (For education, practical training, and languages, you would do similar merging.)
+        merged += "Motivation: " + $("textarea[name='Motivation']").val() + "\n";
+        merged += "Specific Skills: " + $("textarea[name='SpecificSkills']").val() + "\n";
+        merged += "Additional Info: " + $("textarea[name='AdditionalInfo']").val() + "\n";
+        merged += "Declaration: " + ($("input[name='Declaration']").is(":checked") ? "Yes" : "No") + "\n";
+
+        $("#MergedDataHidden").val(merged);
+    });
+</script>
+ *@
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#applicationForm").on("submit", function (e) {
+            console.log("Form submit event fired");
+            // Remove e.preventDefault() if present to allow the form to submit.
+        });
+    });
+    // Initialize Flatpickr for all date inputs
+    flatpickr("input[type='date']", { dateFormat: "Y-m-d" });
+
+    // Dynamic Add/Remove for Employment Section
+    var employmentCount = 1;
+    $("#addEmployment").click(function () {
+        if (employmentCount < 10) {
+            var newBlock = $(".employment-block").first().clone();
+            newBlock.find("input, select, textarea").each(function () {
+                var name = $(this).attr("name");
+                if (name) {
+                    $(this).attr("name", name.replace("EmploymentBlocks[0]", "EmploymentBlocks[" + employmentCount + "]"));
+                }
+                $(this).val("");
+            });
+            newBlock.find(".card-title").text("Employment Block " + (employmentCount + 1));
+            if (!newBlock.find(".deleteEmployment").length) {
+                newBlock.append('<button type="button" class="btn btn-danger deleteEmployment">Delete</button>');
+            }
+            $("#employmentSection").append(newBlock);
+            newBlock.find("input[type='date']").each(function () {
+                flatpickr(this, { dateFormat: "Y-m-d" });
+            });
+            employmentCount++;
+        }
+    });
+    $(document).on("click", ".deleteEmployment", function () {
+        $(this).closest(".employment-block").remove();
+        employmentCount--;
+    });
+
+    /* $("#addEmployment").click(function () {
+        if (employmentCount < 10) {
+            var newBlock = $(".employment-block").first().clone();
+            // Update names and clear values
+            newBlock.find("input, select, textarea").each(function () {
+                var name = $(this).attr("name");
+                if (name) {
+                    $(this).attr("name", name.replace("EmploymentBlocks[0]", "EmploymentBlocks[" + employmentCount + "]"));
+                }
+                $(this).val("");
+            });
+            // Update the header number in the cloned block:
+            newBlock.find(".card-title").text("Employment Block " + (employmentCount + 1));
+            // Append the new block
+            $("#employmentSection").append(newBlock);
+            // Reinitialize Flatpickr on any date inputs in the new block:
+            newBlock.find("input[type='date']").each(function () {
+                flatpickr(this, { dateFormat: "Y-m-d" });
+            });
+            employmentCount++;
+        }
+    }); */
+
+
+    // Dynamic Add/Remove for Education Section
+    var educationCount = 1;
+    $("#addEducation").click(function () {
+        if (educationCount < 10) {
+            var newBlock = $(".education-block").first().clone();
+            newBlock.find("input, select, textarea").each(function () {
+                var name = $(this).attr("name");
+                if (name) {
+                    $(this).attr("name", name.replace("EducationBlocks[0]", "EducationBlocks[" + educationCount + "]"));
+                }
+                $(this).val("");
+            });
+            if (!newBlock.find(".deleteEducation").length) {
+                newBlock.append('<button type="button" class="btn btn-danger deleteEducation">Delete</button>');
+            }
+            $("#educationSection").append(newBlock);
+            educationCount++;
+        }
+    });
+    $(document).on("click", ".deleteEducation", function () {
+        $(this).closest(".education-block").remove();
+        educationCount--;
+    });
+
+    // Dynamic Add/Remove for Practical Training Section
+    var practicalCount = 1;
+    $("#addPracticalTraining").click(function () {
+        if (practicalCount < 10) {
+            var newBlock = $(".practical-block").first().clone();
+            newBlock.find("input, select, textarea").each(function () {
+                var name = $(this).attr("name");
+                if (name) {
+                    $(this).attr("name", name.replace("PracticalTrainingBlocks[0]", "PracticalTrainingBlocks[" + practicalCount + "]"));
+                }
+                $(this).val("");
+            });
+            if (!newBlock.find(".deletePractical").length) {
+                newBlock.append('<button type="button" class="btn btn-danger deletePractical">Delete</button>');
+            }
+            $("#practicalTrainingSection").append(newBlock);
+            practicalCount++;
+        }
+    });
+    $(document).on("click", ".deletePractical", function () {
+        $(this).closest(".practical-block").remove();
+        practicalCount--;
+    });
+
+    // Dynamic Add/Remove for Languages Section
+    var languageCount = 1;
+    $("#addLanguage").click(function () {
+        if (languageCount < 10) {
+            var newBlock = $(".language-block").first().clone();
+            newBlock.find("input, select, textarea").each(function () {
+                var name = $(this).attr("name");
+                if (name) {
+                    $(this).attr("name", name.replace("LanguageBlocks[0]", "LanguageBlocks[" + languageCount + "]"));
+                }
+                $(this).val("");
+            });
+            if (!newBlock.find(".deleteLanguage").length) {
+                newBlock.append('<button type="button" class="btn btn-danger deleteLanguage">Delete</button>');
+            }
+            $("#languageSection").append(newBlock);
+            languageCount++;
+        }
+    });
+    $(document).on("click", ".deleteLanguage", function () {
+        $(this).closest(".language-block").remove();
+        languageCount--;
+    });
+
+    // File Upload for Resume Upload (PDF)
+    $(document).ready(function () {
+        $("#resumeUpload").on("change", function () {
+            var file = this.files[0];
+            if (file) {
+                var formData = new FormData();
+                formData.append("file", file);
+                var proxyUrl = '/api/proxy/upload?accountId=' + '@(ViewBag.AccountId ?? "3360")';
+                var authToken = '@(ViewBag.AuthToken ?? "")';
+                $.ajax({
+                    url: proxyUrl,
+                    type: 'POST',
+                    headers: {
+                        "Authorization": "Bearer " + authToken,
+                        "X-File-Parse": "true"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log("Upload response:", response);
+                        $("#ExternalFileId").val(response.id);
+                        toastr.success("File uploaded successfully.");
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("Upload error:", textStatus, errorThrown);
+                        toastr.error("Error uploading file.");
+                    }
+                });
+            }
+        });
+    });
+
+
+
+    // Merge form data into a single pretty printed string on form submit
+    $("#applicationForm").on("submit", function () {
+        console.log("Form submit event fired");
+        var merged = "";
+        merged += "Position applied for: " + $("input[name='Position']").val() + "\n";
+        merged += "First Name: " + $("input[name='FirstName']").val() + "\n";
+        merged += "Last Name: " + $("input[name='LastName']").val() + "\n";
+        merged += "Date of birth: " + $("input[name='Birthday']").val() + "\n";
+        merged += "Place of birth: " + $("input[name='PlaceOfBirth']").val() + "\n";
+        merged += "Citizenship: " + $("select[name='CitizenshipId']").val() + "\n";
+        merged += "Contact telephone numbers: " + $("input[name='Phone']").val() + "\n";
+        merged += "E-mail Address: " + $("input[name='Email']").val() + "\n";
+        merged += "How did you hear about this vacancy?: " + $("input[name='HowDidYouHear']").val() + "\n";
+        merged += "Social networking profiles: " + $("input[name='Social[0].Value']").val() + "\n";
+        merged += "Convicted: " + $("select[name='Convicted']").val() + "\n";
+        merged += "Currently working at WIUT: " + $("select[name='CurrentlyWorkingAtWIUT']").val() + "\n";
+        merged += "Applied before at WIUT: " + $("select[name='AppliedBeforeAtWIUT']").val() + "\n";
+        merged += "Relatives at WIUT: " + $("select[name='HasRelativesAtWIUT']").val() + "\n";
+
+        // Merge Employment blocks
+        $(".employment-block").each(function (index) {
+            merged += "Employment Block " + (index + 1) + ":\n";
+            merged += "  From: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.FromDate']").val() + "\n";
+            merged += "  To: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.ToDate']").val() + "\n";
+            merged += "  Full/Part Time: " + $(this).find("select[name^='EmploymentBlocks']").filter("[name$='.FullOrPartTime']").val() + "\n";
+            merged += "  Employer: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.EmployerName']").val() + "\n";
+            merged += "  Position: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.PositionInOrg']").val() + "\n";
+            merged += "  Duties: " + $(this).find("textarea[name^='EmploymentBlocks']").filter("[name$='.MainDuties']").val() + "\n";
+            merged += "  Supervisor: " + $(this).find("input[name^='EmploymentBlocks']").filter("[name$='.SupervisorInfo']").val() + "\n";
+        });
+
+        // Merge Education blocks
+        $(".education-block").each(function (index) {
+            merged += "Education Block " + (index + 1) + ":\n";
+            merged += "  From: " + $(this).find("input[name^='EducationBlocks']").filter("[name$='.FromDate']").val() + "\n";
+            merged += "  To: " + $(this).find("input[name^='EducationBlocks']").filter("[name$='.ToDate']").val() + "\n";
+            merged += "  Full/Part Time: " + $(this).find("select[name^='EducationBlocks']").filter("[name$='.FullOrPartTime']").val() + "\n";
+            merged += "  Institution: " + $(this).find("input[name^='EducationBlocks']").filter("[name$='.InstitutionInfo']").val() + "\n";
+            merged += "  Qualifications: " + $(this).find("input[name^='EducationBlocks']").filter("[name$='.Qualifications']").val() + "\n";
+        });
+
+        // Merge Practical Training blocks
+        $(".practical-block").each(function (index) {
+            merged += "Practical Training Block " + (index + 1) + ":\n";
+            merged += "  From: " + $(this).find("input[name^='PracticalTrainingBlocks']").filter("[name$='.FromDate']").val() + "\n";
+            merged += "  To: " + $(this).find("input[name^='PracticalTrainingBlocks']").filter("[name$='.ToDate']").val() + "\n";
+            merged += "  Organisation: " + $(this).find("input[name^='PracticalTrainingBlocks']").filter("[name$='.OrganisationName']").val() + "\n";
+            merged += "  Certification: " + $(this).find("input[name^='PracticalTrainingBlocks']").filter("[name$='.Certification']").val() + "\n";
+        });
+
+        // Merge Language blocks
+        $(".language-block").each(function (index) {
+            merged += "Language Block " + (index + 1) + ":\n";
+            merged += "  Language: " + $(this).find("input[name^='LanguageBlocks']").filter("[name$='.LanguageName']").val() + "\n";
+            merged += "  Reading: " + $(this).find("select[name^='LanguageBlocks']").filter("[name$='.Reading']").val() + "\n";
+            merged += "  Writing: " + $(this).find("select[name^='LanguageBlocks']").filter("[name$='.Writing']").val() + "\n";
+            merged += "  Speaking: " + $(this).find("select[name^='LanguageBlocks']").filter("[name$='.Speaking']").val() + "\n";
+        });
+
+        merged += "Motivation: " + $("textarea[name='Motivation']").val() + "\n";
+        merged += "Specific Skills: " + $("textarea[name='SpecificSkills']").val() + "\n";
+        merged += "Additional Info: " + $("textarea[name='AdditionalInfo']").val() + "\n";
+        merged += "Declaration: " + ($("input[name='Declaration']").is(":checked") ? "Yes" : "No") + "\n";
+
+        $("#MergedDataHidden").val(merged);
+    });
+</script>
