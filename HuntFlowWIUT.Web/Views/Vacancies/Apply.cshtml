@@ -31,6 +31,11 @@
     <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
 }
 <form asp-action="Apply" method="post" enctype="multipart/form-data" id="applicationForm">
+    <div class="form-group">
+        <label>Resume Upload (PDF file)</label>
+        <input type="file" id="resumeUpload" name="ResumeFile" class="form-control" accept=".pdf" />
+        <span asp-validation-for="ResumeFile" class="text-danger"></span>
+    </div>
     <!-- Basic Info Section -->
     <div class="form-group">
         <label>Position applied for*</label>
@@ -76,8 +81,8 @@
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label>Photo</label>
-        <input type="file" asp-for="PhotoFile" class="form-control" accept="image/*" />
+        <label>Photo Upload (image file)</label>
+        <input type="file" id="photoUpload" name="PhotoFile" class="form-control" accept="image/*" />
         <span asp-validation-for="PhotoFile" class="text-danger"></span>
     </div>
     <div class="form-group">
@@ -85,6 +90,7 @@
         <input asp-for="HowDidYouHear" class="form-control" />
         <span asp-validation-for="HowDidYouHear" class="text-danger"></span>
     </div>
+
     <div class="form-group">
         <label>Social networking profiles (if applicable):</label>
         <input asp-for="SocialProfiles" class="form-control" />
@@ -129,14 +135,14 @@
     <div id="employmentSection">
         <div class="employment-block card mb-3">
             <div class="card-body">
-                <h5 class="card-title">Employment Block 1</h5>
+                <h5 class="card-title">Employment 1</h5>
                 <div class="form-group">
                     <label>From date</label>
-                    <input type="date" name="EmploymentBlocks[0].FromDate" class="form-control" />
+                    <input type="text" name="EmploymentBlocks[0].FromDate" class="form-control datepicker" />
                 </div>
                 <div class="form-group">
                     <label>To date</label>
-                    <input type="date" name="EmploymentBlocks[0].ToDate" class="form-control" />
+                    <input type="text" name="EmploymentBlocks[0].ToDate" class="form-control datepicker" />
                 </div>
                 <div class="form-group">
                     <label>Full or Part Time</label>
@@ -181,14 +187,14 @@
     <div id="educationSection">
         <div class="education-block card mb-3">
             <div class="card-body">
-                <h5 class="card-title">Education Block 1</h5>
+                <h5 class="card-title">Education 1</h5>
                 <div class="form-group">
                     <label>From date</label>
-                    <input type="date" name="EducationBlocks[0].FromDate" class="form-control" />
+                    <input type="text" name="EducationBlocks[0].FromDate" class="form-control datepicker" />
                 </div>
                 <div class="form-group">
                     <label>To date</label>
-                    <input type="date" name="EducationBlocks[0].ToDate" class="form-control" />
+                    <input type="text" name="EducationBlocks[0].ToDate" class="form-control datepicker" />
                 </div>
                 <div class="form-group">
                     <label>Full or Part Time</label>
@@ -216,14 +222,14 @@
     <div id="practicalTrainingSection">
         <div class="practical-block card mb-3">
             <div class="card-body">
-                <h5 class="card-title">Practical Training Block 1</h5>
+                <h5 class="card-title">Practical Training 1</h5>
                 <div class="form-group">
                     <label>From date</label>
-                    <input type="date" name="PracticalTrainingBlocks[0].FromDate" class="form-control" />
+                    <input type="text" name="PracticalTrainingBlocks[0].FromDate" class="form-control datepicker" />
                 </div>
                 <div class="form-group">
                     <label>To date</label>
-                    <input type="date" name="PracticalTrainingBlocks[0].ToDate" class="form-control" />
+                    <input type="text" name="PracticalTrainingBlocks[0].ToDate" class="form-control datepicker" />
                 </div>
                 <div class="form-group">
                     <label>Name of Organisation</label>
@@ -244,7 +250,7 @@
     <div id="languageSection">
         <div class="language-block card mb-3">
             <div class="card-body">
-                <h5 class="card-title">Language Block 1</h5>
+                <h5 class="card-title">Language 1</h5>
                 <div class="form-group">
                     <label>Language name</label>
                     <input type="text" name="LanguageBlocks[0].LanguageName" class="form-control" />
@@ -283,11 +289,7 @@
 
     <!-- Additional Fields -->
     <hr />
-    <div class="form-group">
-        <label>Resume Upload (PDF file)</label>
-        <input type="file" id="resumeUpload" name="ResumeFile" class="form-control" accept=".pdf" />
-        <span asp-validation-for="ResumeFile" class="text-danger"></span>
-    </div>
+
     <div class="form-group">
         <label>What is your motivation to join us?</label>
         <textarea asp-for="Motivation" class="form-control"></textarea>
@@ -320,6 +322,7 @@
     <input type="hidden" asp-for="MergedApplicationData" id="MergedDataHidden" />
     <!-- External resume file ID from resume upload -->
     <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="" />
+    <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
 
     <button type="submit" class="btn btn-primary">Submit Application</button>
 </form>
@@ -451,39 +454,14 @@
         });
     });
     // Initialize Flatpickr for all date inputs
-    flatpickr("input[type='date']", { dateFormat: "Y-m-d" });
+    flatpickr("input.datepicker", { dateFormat: "Y-m-d" });
 
     // Dynamic Add/Remove for Employment Section
-    var employmentCount = 1;
+        var employmentCount = 1;
     $("#addEmployment").click(function () {
         if (employmentCount < 10) {
             var newBlock = $(".employment-block").first().clone();
-            newBlock.find("input, select, textarea").each(function () {
-                var name = $(this).attr("name");
-                if (name) {
-                    $(this).attr("name", name.replace("EmploymentBlocks[0]", "EmploymentBlocks[" + employmentCount + "]"));
-                }
-                $(this).val("");
-            });
-            newBlock.find(".card-title").text("Employment Block " + (employmentCount + 1));
-            if (!newBlock.find(".deleteEmployment").length) {
-                newBlock.append('<button type="button" class="btn btn-danger deleteEmployment">Delete</button>');
-            }
-            $("#employmentSection").append(newBlock);
-            newBlock.find("input[type='date']").each(function () {
-                flatpickr(this, { dateFormat: "Y-m-d" });
-            });
-            employmentCount++;
-        }
-    });
-    $(document).on("click", ".deleteEmployment", function () {
-        $(this).closest(".employment-block").remove();
-        employmentCount--;
-    });
 
-    /* $("#addEmployment").click(function () {
-        if (employmentCount < 10) {
-            var newBlock = $(".employment-block").first().clone();
             // Update names and clear values
             newBlock.find("input, select, textarea").each(function () {
                 var name = $(this).attr("name");
@@ -492,17 +470,36 @@
                 }
                 $(this).val("");
             });
-            // Update the header number in the cloned block:
-            newBlock.find(".card-title").text("Employment Block " + (employmentCount + 1));
-            // Append the new block
+
+            // Update block title
+            newBlock.find(".card-title").text("Employment " + (employmentCount + 1));
+
+            // Append a delete button if not present
+            if (!newBlock.find(".deleteEmployment").length) {
+                newBlock.append('<button type="button" class="btn btn-danger deleteEmployment">Delete</button>');
+            }
+
+            // Append the block
             $("#employmentSection").append(newBlock);
-            // Reinitialize Flatpickr on any date inputs in the new block:
-            newBlock.find("input[type='date']").each(function () {
+
+            // Reinitialize flatpickr on new datepicker inputs in the cloned block
+            newBlock.find("input.datepicker").each(function () {
+                // Destroy any existing instance (if present)
+                if (this._flatpickr) {
+                    this._flatpickr.destroy();
+                }
                 flatpickr(this, { dateFormat: "Y-m-d" });
             });
+
             employmentCount++;
         }
-    }); */
+    });
+    $(document).on("click", ".deleteEmployment", function () {
+        $(this).closest(".employment-block").remove();
+        employmentCount--;
+    });
+
+   
 
 
     // Dynamic Add/Remove for Education Section
@@ -517,10 +514,18 @@
                 }
                 $(this).val("");
             });
+            newBlock.find(".card-title").text("Education " + (educationCount + 1));
             if (!newBlock.find(".deleteEducation").length) {
                 newBlock.append('<button type="button" class="btn btn-danger deleteEducation">Delete</button>');
             }
             $("#educationSection").append(newBlock);
+            newBlock.find("input.datepicker").each(function () {
+                // Destroy any existing instance (if present)
+                if (this._flatpickr) {
+                    this._flatpickr.destroy();
+                }
+                flatpickr(this, { dateFormat: "Y-m-d" });
+            });
             educationCount++;
         }
     });
@@ -541,10 +546,18 @@
                 }
                 $(this).val("");
             });
+            newBlock.find(".card-title").text("Practical Training " + (practicalCount + 1));
             if (!newBlock.find(".deletePractical").length) {
                 newBlock.append('<button type="button" class="btn btn-danger deletePractical">Delete</button>');
             }
             $("#practicalTrainingSection").append(newBlock);
+            newBlock.find("input.datepicker").each(function () {
+                // Destroy any existing instance (if present)
+                if (this._flatpickr) {
+                    this._flatpickr.destroy();
+                }
+                flatpickr(this, { dateFormat: "Y-m-d" });
+            });
             practicalCount++;
         }
     });
@@ -565,6 +578,7 @@
                 }
                 $(this).val("");
             });
+            newBlock.find(".card-title").text("Language " + (languageCount + 1));
             if (!newBlock.find(".deleteLanguage").length) {
                 newBlock.append('<button type="button" class="btn btn-danger deleteLanguage">Delete</button>');
             }
@@ -599,7 +613,36 @@
                     success: function (response) {
                         console.log("Upload response:", response);
                         $("#ExternalFileId").val(response.id);
-                        toastr.success("File uploaded successfully.");
+                        toastr.success("Resume uploaded successfully.");
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        console.error("Upload error:", textStatus, errorThrown);
+                        toastr.error("Error uploading file.");
+                    }
+                });
+            }
+        });
+        $("#photoUpload").on("change", function () {
+            var file = this.files[0];
+            if (file) {
+                var formData = new FormData();
+                formData.append("file", file);
+                var proxyUrl = '/api/proxy/upload?accountId=' + '@(ViewBag.AccountId ?? "3360")' + '&isPhoto=true';
+                var authToken = '@(ViewBag.AuthToken ?? "")';
+                $.ajax({
+                    url: proxyUrl,
+                    type: 'POST',
+                    headers: {
+                        "Authorization": "Bearer " + authToken,
+                        "X-File-Parse": "false"
+                    },
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        console.log("Photo upload response:", response);
+                        $("#PhotoFileId").val(response.id);
+                        toastr.success("Photo uploaded successfully.");
                     },
                     error: function (jqXHR, textStatus, errorThrown) {
                         console.error("Upload error:", textStatus, errorThrown);
@@ -678,4 +721,29 @@
 
         $("#MergedDataHidden").val(merged);
     });
+
+
+
+     /* $("#addEmployment").click(function () {
+        if (employmentCount < 10) {
+            var newBlock = $(".employment-block").first().clone();
+            // Update names and clear values
+            newBlock.find("input, select, textarea").each(function () {
+                var name = $(this).attr("name");
+                if (name) {
+                    $(this).attr("name", name.replace("EmploymentBlocks[0]", "EmploymentBlocks[" + employmentCount + "]"));
+                }
+                $(this).val("");
+            });
+            // Update the header number in the cloned block:
+            newBlock.find(".card-title").text("Employment Block " + (employmentCount + 1));
+            // Append the new block
+            $("#employmentSection").append(newBlock);
+            // Reinitialize Flatpickr on any date inputs in the new block:
+            newBlock.find("input[type='date']").each(function () {
+                flatpickr(this, { dateFormat: "Y-m-d" });
+            });
+            employmentCount++;
+        }
+    }); */
 </script>

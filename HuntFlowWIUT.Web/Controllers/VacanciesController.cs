@@ -1,4 +1,5 @@
-﻿using HuntFlowWIUT.Web.Models;
+﻿using HuntFlowWIUT.Web.Helpers;
+using HuntFlowWIUT.Web.Models;
 using HuntFlowWIUT.Web.Models.ViewModels;
 using HuntFlowWIUT.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -198,6 +199,99 @@ namespace HuntFlowWIUT.Web.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ApplyAcademic(int id)
+        {
+            // Retrieve vacancy details (which include AccountDivision, Position, Company, etc.)
+            var vacancy = await _huntflowService.GetVacancyDetailAsync(_accountId, id);
+            if (vacancy == null)
+            {
+                return NotFound();
+            }
+         
+                // Build the view model for the second type of application form.
+            var model = new ApplicantCreationAcademicViewModel
+            {
+                // Pre-fill Position from vacancy details.
+                Position = vacancy.Position,
+                // You can initialize AreaOfInterest to an empty string.
+                AreaOfInterest = "",
+
+                // First and Last Name are left for the applicant to fill.
+                FirstName = "",
+                LastName = "",
+
+                // Contact and Citizenship will be filled by the applicant.
+                Phone = "",
+                Email = "",
+
+                // Photo: set to 0 initially (it will be updated via AJAX upload)
+                Photo = 0,
+
+                // Research IDs block – initialize with empty values.
+                ResearchIds = new ResearchIds(),
+
+                // Degrees: start with an empty list; user must select at least one.
+                Degrees = new List<string>(),
+
+                // How did you hear about this vacancy? (and detail)
+                HowDidYouHear = "",
+                HowDidYouHearDetail = "",
+
+                // Boolean selections – default values can be adjusted as needed.
+                CurrentlyInUzbekistan = true,
+                AppliedBeforeAtWIUT = false,
+                EverWorkedAtWIUT = false,
+                HasRelativesAtWIUT = false,
+                Convicted = false,
+
+                // Desired salary (set default to 0 and currency to UZS)
+                DesiredSalary = 0,
+                SalaryCurrency = "UZS",
+
+                // File attachments – initialize all file ID properties to 0.
+                CoverLetter = 0,
+                Cv = 0,
+                EvaluationReport = 0,
+                Vision = 0,
+                TeachingPortfolio = 0,
+                ResearchStatement = 0,
+                Dissertation = 0,
+                Diplomas = 0,
+                Transcripts = 0,
+                EnglishCertificate = 0,
+                References = 0,
+
+                // Declaration and submission date.
+                Declaration = false,
+                SubmissionDate = DateTime.Now,
+
+                // Merged application data – will be built on the client side via JavaScript.
+                MergedApplicationData = ""
+            };
+
+            // Populate the Citizenship dropdown.
+            var countries = await _countryService.GetCountriesAsync();
+            var defaultCountry = countries.FirstOrDefault(c => c.Name.Equals("Uzbekistan", StringComparison.OrdinalIgnoreCase));
+            int? defaultCountryId = defaultCountry?.Id;
+            model.CitizenshipId = defaultCountryId ?? 0;
+            model.Countries = new SelectList(countries, "Id", "Name", defaultCountryId);
+
+            // (If your model has additional properties – e.g., for Social accounts – initialize them here as needed.)
+            // For example, if you use social for this form:
+            model.Social = new List<SocialAccountViewModel>
+            {
+                new SocialAccountViewModel { Value = "" }
+            };
+
+            // Pass additional values via ViewBag if required.
+            ViewBag.AccountId = _accountId;
+            ViewBag.AuthToken = _configuration["Huntflow:AccessToken"];
+
+            return View("ApplyAcademic", model);
+        }
+
+
 
         [HttpPost]
         public async Task<IActionResult> Apply(int id, ApplicantCreationViewModel model)
@@ -260,7 +354,6 @@ namespace HuntFlowWIUT.Web.Controllers
             // Set the merged application data into the external resume's Data.Body.
             model.Externals[0].Data.Body = model.MergedApplicationData;
             model.SubmissionDate = DateTime.Now;
-            model.PhotoFile = null;
 
             var applicant = await _huntflowService.CreateApplicantAsync(_accountId, model);
             TempData["SuccessMessage"] = "Your application was submitted successfully!";

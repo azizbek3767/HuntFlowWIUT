@@ -1,41 +1,124 @@
-﻿@model HuntFlowWIUT.Web.Models.VacancyDetail
+﻿@using HuntFlowWIUT.Web.Helpers
+@model HuntFlowWIUT.Web.Models.VacancyDetail
 
 @{
     ViewData["Title"] = Model.Position;
+    bool isAcademic = VacancyFormHelper.IsAcademicDivision(Model.Account_Division);
 }
 
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div class="p-6">
+            <!-- Vacancy Title -->
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">@Model.Position</h2>
+            <!-- Vacancy Basic Info -->
+            <div class="mb-4">
+                <p class="text-gray-600"><strong>Company:</strong> @Model.Company</p>
+                <p class="text-gray-600"><strong>Salary:</strong> @Model.Money</p>
+                <p class="text-gray-600"><strong>Status:</strong> @Model.State</p>
+                <p class="text-gray-600"><strong>Account Division:</strong> @Model.Account_Division</p>
 
-<div class="container mt-4">
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h2 class="card-title">@Model.Position</h2>
-            <p><strong>Company:</strong> @Model.Company</p>
-            <p><strong>Salary:</strong> @Model.Money</p>
-            <p><strong>Status:</strong> @Model.State</p>
-            <hr />
-            <h4>Details</h4>
-            <div>@Html.Raw(Model.Body)</div>
-            <hr />
-            <h4>Requirements</h4>
-            <div>@Html.Raw(Model.Requirements)</div>
-            <hr />
-            <h4>Conditions</h4>
-            <div>@Html.Raw(Model.Conditions)</div>
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Vacancy Details -->
+            <h4 class="text-xl font-semibold text-gray-700 mb-2">Details</h4>
+            <div class="prose max-w-none">
+                @Html.Raw(Model.Body)
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Vacancy Requirements -->
+            <h4 class="text-xl font-semibold text-gray-700 mb-2">Requirements</h4>
+            <div class="prose max-w-none">
+                @Html.Raw(Model.Requirements)
+            </div>
+
+            <hr class="my-4" />
+
+            <!-- Vacancy Conditions -->
+            <h4 class="text-xl font-semibold text-gray-700 mb-2">Conditions</h4>
+            <div class="prose max-w-none">
+                @Html.Raw(Model.Conditions)
+            </div>
+
             @if (Model.Files != null && Model.Files.Any())
             {
-                <hr />
-                <h4>Attachments</h4>
-                <ul>
+                <hr class="my-4" />
+                <h4 class="text-xl font-semibold text-gray-700 mb-2">Attachments</h4>
+                <ul class="list-disc pl-5">
                     @foreach (var file in Model.Files)
                     {
-                        <li><a href="@file.Url" target="_blank">@file.Name</a></li>
+                        <li class="text-blue-600 hover:underline">
+                            <a href="@file.Url" target="_blank">@file.Name</a>
+                        </li>
                     }
                 </ul>
             }
-            <div class="mt-4">
-                <a href="@Url.Action("Apply", "Vacancies", new { id = Model.Id })" class="btn btn-success">Apply</a>
+
+            <!-- Apply Button -->
+            <div class="mt-6 text-center">
+                @if (isAcademic)
+                {
+                    <a href="@Url.Action("ApplyAcademic", "Vacancies", new { id = Model.Id })" class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded">
+                        Apply
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.Action("Apply", "Vacancies", new { id = Model.Id })" class="inline-block bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded">
+                        Apply
+                    </a>
+                }
             </div>
         </div>
-        
     </div>
 </div>
+
+
+@* <div class="container mt-4"> *@
+@*     <div class="card shadow-sm"> *@
+@*         <div class="card-body"> *@
+@*             <h2 class="card-title">@Model.Position</h2> *@
+@*             <p><strong>Company:</strong> @Model.Company</p> *@
+@*             <p><strong>Salary:</strong> @Model.Money</p> *@
+@*             <p><strong>Status:</strong> @Model.State</p> *@
+@*             <hr /> *@
+@*             <h4>Details</h4> *@
+@*             <div>@Html.Raw(Model.Body)</div> *@
+@*             <hr /> *@
+@*             <h4>Requirements</h4> *@
+@*             <div>@Html.Raw(Model.Requirements)</div> *@
+@*             <hr /> *@
+@*             <h4>Conditions</h4> *@
+@*             <div>@Html.Raw(Model.Conditions)</div> *@
+@*             @if (Model.Files != null && Model.Files.Any()) *@
+@*             { *@
+@*                 <hr /> *@
+@*                 <h4>Attachments</h4> *@
+@*                 <ul> *@
+@*                     @foreach (var file in Model.Files) *@
+@*                     { *@
+@*                         <li><a href="@file.Url" target="_blank">@file.Name</a></li> *@
+@*                     } *@
+@*                 </ul> *@
+@*             } *@
+@*             <div class="mt-4"> *@
+@*                 @if (isAcademic) *@
+@*                 { *@
+@*                     <a href="@Url.Action("ApplyAcademic", "Vacancies", new { id = Model.Id })" class="btn btn-success">Apply</a> *@
+@*                 } *@
+@*                 else *@
+@*                 { *@
+@*                     <a href="@Url.Action("Apply", "Vacancies", new { id = Model.Id })" class="btn btn-success">Apply</a> *@
+@*                 } *@
+@*             </div> *@
+@*         </div> *@
+        
+@*     </div> *@
+@* </div> *@
+
+
+

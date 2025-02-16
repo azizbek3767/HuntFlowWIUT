@@ -54,9 +54,12 @@ namespace HuntFlowWIUT.Web.Models.ViewModels
         [JsonPropertyName("company")]
         public string Company { get; set; } = "Company";
 
+        [JsonIgnore]
+        public IFormFile PhotoFile { get; set; }
+
         // Photo upload (file) – not merged in big string.
         [JsonPropertyName("photo")]
-        public IFormFile? PhotoFile { get; set; }
+        public int Photo { get; set; }
 
         public string? HowDidYouHear { get; set; } = string.Empty;
 

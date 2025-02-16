@@ -1,0 +1,430 @@
+﻿@model HuntFlowWIUT.Web.Models.ViewModels.ApplicantCreationAcademicViewModel
+
+@{
+    ViewData["Title"] = "Apply for Academic Positions";
+    // Assume Model.Countries is populated by the controller.
+    var accountId = ViewBag.AccountId ?? "3360";
+    var authToken = ViewBag.AuthToken ?? "your_token_here";
+}
+
+<div class="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+    <h2 class="text-3xl font-bold text-center mb-6">Application Form - Type 2</h2>
+
+    @Html.ValidationSummary(true, "", new { @class = "text-red-600 mb-4" })
+    @if (ViewBag.ErrorList != null)
+    {
+        <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+            <ul>
+                @foreach (var err in ViewBag.ErrorList as List<string>)
+                {
+                    <li>@err</li>
+                }
+            </ul>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">@TempData["ErrorMessage"]</div>
+    }
+
+    <form asp-action="Apply" method="post" enctype="multipart/form-data" id="applicationForm" class="space-y-6">
+        <!-- Resume Upload -->
+        <div>
+            <label class="block text-lg font-semibold text-gray-700 mb-2">Resume Upload (PDF file)</label>
+            <input type="file" id="resumeUpload" name="ResumeFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf" />
+            <span asp-validation-for="ResumeFile" class="text-red-600"></span>
+        </div>
+        <!-- Hidden field for Resume file ID -->
+        <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="0" />
+
+        <!-- Basic Information -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Position applied for*</label>
+                <input asp-for="Position" class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed" readonly />
+                <span asp-validation-for="Position" class="text-red-600"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">First Name*</label>
+                    <input asp-for="FirstName" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="FirstName" class="text-red-600"></span>
+                </div>
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Last Name*</label>
+                    <input asp-for="LastName" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="LastName" class="text-red-600"></span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Contact telephone numbers*</label>
+                    <input asp-for="Phone" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="Phone" class="text-red-600"></span>
+                </div>
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">E-mail Address*</label>
+                    <input asp-for="Email" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="Email" class="text-red-600"></span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Citizenship*</label>
+                <select asp-for="CitizenshipId" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" asp-items="Model.Countries">
+                    <option value="">Select a country</option>
+                </select>
+                <span asp-validation-for="CitizenshipId" class="text-red-600"></span>
+            </div>
+        </div>
+
+        <!-- Photo Upload -->
+        <div>
+            <label class="block text-lg font-semibold text-gray-700 mb-2">Photo Upload (image file)</label>
+            <input type="file" id="photoUpload" name="PhotoFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept="image/*" />
+            <span asp-validation-for="PhotoFile" class="text-red-600"></span>
+        </div>
+        <!-- Hidden field for Photo file ID -->
+        <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
+
+        <!-- Research IDs Block -->
+        <div>
+            <h4 class="text-xl font-semibold text-gray-700 mb-2">Research IDs (if applicable)</h4>
+            <div class="space-y-4 p-4 bg-gray-50 rounded border border-gray-200">
+                <div class="flex items-center space-x-4">
+                    <input type="checkbox" id="chkGoogleScholar" class="form-checkbox h-5 w-5 text-blue-600" />
+                    <label for="chkGoogleScholar" class="text-gray-700 font-medium">Google Scholar</label>
+                    <input type="text" id="txtGoogleScholar" name="ResearchIds.GoogleScholar" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" disabled />
+                </div>
+                <div class="flex items-center space-x-4">
+                    <input type="checkbox" id="chkOrcid" class="form-checkbox h-5 w-5 text-blue-600" />
+                    <label for="chkOrcid" class="text-gray-700 font-medium">ORCID</label>
+                    <input type="text" id="txtOrcid" name="ResearchIds.Orcid" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" disabled />
+                </div>
+                <div class="flex items-center space-x-4">
+                    <input type="checkbox" id="chkResearchOther" class="form-checkbox h-5 w-5 text-blue-600" />
+                    <label for="chkResearchOther" class="text-gray-700 font-medium">Other</label>
+                    <input type="text" id="txtResearchOther" name="ResearchIds.Other" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" disabled />
+                </div>
+            </div>
+        </div>
+
+        <!-- Degrees Block -->
+        <div>
+            <h4 class="text-xl font-semibold text-gray-700 mb-2">Degrees (select at least one)*</h4>
+            <div class="flex flex-wrap items-center space-x-6">
+                <div class="flex items-center">
+                    <input type="checkbox" name="Degrees" value="PhD" class="form-checkbox h-5 w-5 text-blue-600" id="degPhD" />
+                    <label for="degPhD" class="ml-2 text-gray-700">PhD</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="Degrees" value="PhD candidate" class="form-checkbox h-5 w-5 text-blue-600" id="degPhDCandidate" />
+                    <label for="degPhDCandidate" class="ml-2 text-gray-700">PhD candidate</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="Degrees" value="Master's/MBA" class="form-checkbox h-5 w-5 text-blue-600" id="degMastersMBA" />
+                    <label for="degMastersMBA" class="ml-2 text-gray-700">Master's/MBA</label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="Degrees" value="Bachelor's" class="form-checkbox h-5 w-5 text-blue-600" id="degBachelors" />
+                    <label for="degBachelors" class="ml-2 text-gray-700">Bachelor's</label>
+                </div>
+            </div>
+            <span asp-validation-for="Degrees" class="text-red-600"></span>
+        </div>
+
+        <!-- How did you hear about this vacancy? Block -->
+        <div>
+            <h4 class="text-xl font-semibold text-gray-700 mb-2">How did you hear about this vacancy?*</h4>
+            <div class="mb-2">
+                <select id="howDidYouHear" name="HowDidYouHear" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                    <option value="WIUT website">WIUT website</option>
+                    <option value="LinkedIn">LinkedIn</option>
+                    <option value="ResearchGate">ResearchGate</option>
+                    <option value="Acadeus">Acadeus</option>
+                    <option value="WIUT employee">WIUT employee</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span asp-validation-for="HowDidYouHear" class="text-red-600"></span>
+            </div>
+            <div class="mb-4" id="howDidYouHearDetailContainer" style="display:none;">
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Please specify:</label>
+                <input type="text" id="howDidYouHearDetail" name="HowDidYouHearDetail" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+            </div>
+        </div>
+
+        <!-- Boolean Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Are you currently in Uzbekistan?*</label>
+                <select asp-for="CurrentlyInUzbekistan" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                <span asp-validation-for="CurrentlyInUzbekistan" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Have you applied for any position at WIUT before?*</label>
+                <select asp-for="AppliedBeforeAtWIUT" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                <span asp-validation-for="AppliedBeforeAtWIUT" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Have you ever worked at WIUT?*</label>
+                <select asp-for="EverWorkedAtWIUT" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                    <option value="true">Yes</option>
+                    <option value="false">No</option>
+                </select>
+                <span asp-validation-for="EverWorkedAtWIUT" class="text-red-600"></span>
+            </div>
+        </div>
+        <div class="mb-6">
+            <label class="block text-lg font-semibold text-gray-700 mb-2">Do you have relatives who are currently employed at WIUT?*</label>
+            <select asp-for="HasRelativesAtWIUT" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <span asp-validation-for="HasRelativesAtWIUT" class="text-red-600"></span>
+        </div>
+        <div class="mb-6">
+            <label class="block text-lg font-semibold text-gray-700 mb-2">Have you ever been convicted of a crime?*</label>
+            <select asp-for="Convicted" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <span asp-validation-for="Convicted" class="text-red-600"></span>
+        </div>
+
+        <!-- Salary -->
+        <div class="mb-6">
+            <label class="block text-lg font-semibold text-gray-700 mb-2">Desired salary level (monthly)</label>
+            <div class="flex">
+                <input asp-for="DesiredSalary" class="w-full px-3 py-2 border border-gray-300 rounded-l focus:outline-none focus:ring focus:border-blue-500" placeholder="Enter salary amount" />
+                <select asp-for="SalaryCurrency" class="px-3 py-2 border border-gray-300 rounded-r focus:outline-none focus:ring focus:border-blue-500">
+                    <option value="UZS" selected>UZS</option>
+                    <option value="GBP">£ GBP</option>
+                    <option value="USD">$ USD</option>
+                </select>
+            </div>
+            <span asp-validation-for="DesiredSalary" class="text-red-600"></span>
+            <span asp-validation-for="SalaryCurrency" class="text-red-600"></span>
+        </div>
+
+        <!-- File Uploads Section -->
+        <hr class="my-6" />
+        <h4 class="text-2xl font-semibold text-gray-700 mb-4">Please upload your files below:</h4>
+        <p class="mb-4 text-gray-600">Total size of attachments must not exceed 50 MB</p>
+        <div class="grid grid-cols-1 gap-4">
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Cover letter</label>
+                <input type="file" asp-for="CoverLetterFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="CoverLetterFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">CV</label>
+                <input type="file" asp-for="CvFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="CvFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Scanned copy of previous performance evaluation report</label>
+                <input type="file" asp-for="EvaluationReportFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="EvaluationReportFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Statement of your vision of the post</label>
+                <input type="file" asp-for="VisionFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="VisionFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Teaching portfolio</label>
+                <input type="file" asp-for="TeachingPortfolioFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="TeachingPortfolioFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Research statement/plan</label>
+                <input type="file" asp-for="ResearchStatementFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="ResearchStatementFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Copy of your dissertation or a published article (Abstract can be attached)</label>
+                <input type="file" asp-for="DissertationFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="DissertationFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Diplomas</label>
+                <input type="file" asp-for="DiplomasFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="DiplomasFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Transcripts</label>
+                <input type="file" asp-for="TranscriptsFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="TranscriptsFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">English language certificate</label>
+                <input type="file" asp-for="EnglishCertificateFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="EnglishCertificateFile" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">List of reference (at least 2)</label>
+                <input type="file" asp-for="ReferencesFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf,.doc,.docx" />
+                <span asp-validation-for="ReferencesFile" class="text-red-600"></span>
+            </div>
+        </div>
+
+        <!-- Declaration and Submission Date -->
+        <div class="mb-6">
+            <div class="flex items-center">
+                <input type="checkbox" asp-for="Declaration" class="form-checkbox h-5 w-5 text-blue-600" />
+                <label asp-for="Declaration" class="ml-2 text-gray-700">I declare that the information provided on this application form is true and correct to the best of my knowledge.</label>
+            </div>
+            <span asp-validation-for="Declaration" class="text-red-600"></span>
+        </div>
+        <input type="hidden" asp-for="SubmissionDate" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
+
+        <!-- Hidden fields for merged data and external resume -->
+        <input type="hidden" asp-for="MergedApplicationData" id="MergedDataHidden" />
+        <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="0" />
+        <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
+
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded">Submit Application</button>
+    </form>
+</div>
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" />
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Initialize flatpickr on all inputs with class "datepicker"
+            flatpickr("input.datepicker", { dateFormat: "Y-m-d" });
+
+            // Enable research IDs input fields when checkboxes are checked
+            $("#chkGoogleScholar").change(function () {
+                $("#txtGoogleScholar").prop("disabled", !this.checked);
+            });
+            $("#chkOrcid").change(function () {
+                $("#txtOrcid").prop("disabled", !this.checked);
+            });
+            $("#chkResearchOther").change(function () {
+                $("#txtResearchOther").prop("disabled", !this.checked);
+            });
+
+            // How did you hear block: show/hide detail input
+            $("#howDidYouHear").change(function () {
+                var selected = $(this).val();
+                if (selected === "WIUT employee" || selected === "Other") {
+                    $("#howDidYouHearDetailContainer").show();
+                } else {
+                    $("#howDidYouHearDetailContainer").hide();
+                    $("#howDidYouHearDetail").val("");
+                }
+            });
+
+            // File upload for Resume (PDF)
+            $("#resumeUpload").on("change", function () {
+                var file = this.files[0];
+                if (file) {
+                    var formData = new FormData();
+                    formData.append("file", file);
+                    var proxyUrl = '/api/proxy/upload?accountId=' + '@(ViewBag.AccountId ?? "3360")';
+                    var authToken = '@(ViewBag.AuthToken ?? "your_token_here")';
+                    $.ajax({
+                        url: proxyUrl,
+                        type: 'POST',
+                        headers: {
+                            "Authorization": "Bearer " + authToken,
+                            "X-File-Parse": "true"
+                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            console.log("Resume upload response:", response);
+                            $("#ExternalFileId").val(response.id);
+                            toastr.success("Resume file uploaded successfully.");
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error("Resume upload error:", textStatus, errorThrown);
+                            toastr.error("Error uploading resume file.");
+                        }
+                    });
+                }
+            });
+
+            // File upload for Photo
+            $("#photoUpload").on("change", function () {
+                var file = this.files[0];
+                if (file) {
+                    var formData = new FormData();
+                    formData.append("file", file);
+                    var proxyUrl = '/api/proxy/upload?accountId=' + '@(ViewBag.AccountId ?? "3360")' + '&isPhoto=true';
+                    var authToken = '@(ViewBag.AuthToken ?? "your_token_here")';
+                    $.ajax({
+                        url: proxyUrl,
+                        type: 'POST',
+                        headers: {
+                            "Authorization": "Bearer " + authToken
+                        },
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            console.log("Photo upload response:", response);
+                            $("#PhotoFileId").val(response.id);
+                            toastr.success("Photo uploaded successfully.");
+                        },
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            console.error("Photo upload error:", textStatus, errorThrown);
+                            toastr.error("Error uploading photo.");
+                        }
+                    });
+                }
+            });
+
+            // Merge form data on submit
+            $("#applicationForm").on("submit", function () {
+                var merged = "";
+                merged += "Position applied for: " + $("input[name='Position']").val() + "\n";
+                merged += "Area Of Interest: " + $("input[name='AreaOfInterest']").val() + "\n";
+                merged += "First Name: " + $("input[name='FirstName']").val() + "\n";
+                merged += "Last Name: " + $("input[name='LastName']").val() + "\n";
+                merged += "Contact telephone numbers: " + $("input[name='Phone']").val() + "\n";
+                merged += "Citizenship: " + $("select[name='CitizenshipId']").val() + "\n";
+                merged += "E-mail Address: " + $("input[name='Email']").val() + "\n";
+                if ($("#chkGoogleScholar").is(":checked")) {
+                    merged += "Google Scholar: " + $("#txtGoogleScholar").val() + "\n";
+                }
+                if ($("#chkOrcid").is(":checked")) {
+                    merged += "ORCID: " + $("#txtOrcid").val() + "\n";
+                }
+                if ($("#chkResearchOther").is(":checked")) {
+                    merged += "Other Research ID: " + $("#txtResearchOther").val() + "\n";
+                }
+                var degrees = [];
+                $("input[name='Degrees']:checked").each(function () {
+                    degrees.push($(this).val());
+                });
+                merged += "Degrees: " + degrees.join(", ") + "\n";
+                merged += "How did you hear about this vacancy?: " + $("#howDidYouHear").val() + "\n";
+                if ($("#howDidYouHearDetailContainer").is(":visible")) {
+                    merged += "Detail: " + $("#howDidYouHearDetail").val() + "\n";
+                }
+                merged += "Currently in Uzbekistan: " + $("select[name='CurrentlyInUzbekistan']").val() + "\n";
+                merged += "Applied before at WIUT: " + $("select[name='AppliedBeforeAtWIUT']").val() + "\n";
+                merged += "Ever worked at WIUT: " + $("select[name='EverWorkedAtWIUT']").val() + "\n";
+                merged += "Relatives at WIUT: " + $("select[name='HasRelativesAtWIUT']").val() + "\n";
+                merged += "Convicted: " + $("select[name='Convicted']").val() + "\n";
+                merged += "Desired salary: " + $("input[name='DesiredSalary']").val() + " " + $("select[name='SalaryCurrency']").val() + "\n";
+                merged += "Motivation: " + $("textarea[name='Motivation']").val() + "\n";
+                merged += "Specific Skills: " + $("textarea[name='SpecificSkills']").val() + "\n";
+                merged += "Additional Info: " + $("textarea[name='AdditionalInfo']").val() + "\n";
+                merged += "Declaration: " + ($("input[name='Declaration']").is(":checked") ? "Yes" : "No") + "\n";
+                $("#MergedDataHidden").val(merged);
+            });
+        });
+    </script>
+}

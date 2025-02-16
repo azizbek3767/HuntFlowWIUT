@@ -1,9 +1,137 @@
-﻿@model HuntFlowWIUT.Web.Models.ViewModels.VacanciesIndexViewModel
+﻿@using HuntFlowWIUT.Web.Helpers
+@model HuntFlowWIUT.Web.Models.ViewModels.VacanciesIndexViewModel
 @{
     ViewData["Title"] = "Vacancies";
+    // Separate the vacancies using LINQ based on the helper method.
+    var academicVacancies = Model.Vacancies.Where(v => VacancyFormHelper.IsAcademicDivision(v.Account_Division)).ToList();
+    var administrativeVacancies = Model.Vacancies.Where(v => !VacancyFormHelper.IsAcademicDivision(v.Account_Division)).ToList();
 }
 
-<div class="container mt-4">
+
+
+<div class="container mx-auto px-4 py-8">
+    <h2 class="text-4xl font-bold text-center mb-8">Vacancies</h2>
+
+    <!-- Tab Navigation -->
+    <div class="flex justify-center mb-6 border-b border-gray-300">
+        <button id="adminTab" class="tab-btn px-6 py-2 focus:outline-none border-b-4 font-semibold">
+            Administrative Vacancies
+        </button>
+        <button id="academicTab" class="tab-btn px-6 py-2 focus:outline-none border-b-4 font-semibold">
+            Academic Vacancies
+        </button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="adminContent" class="tab-content">
+        @if (administrativeVacancies.Any())
+        {
+            @foreach (var vacancy in administrativeVacancies)
+            {
+                <div class="w-full bg-gray-50 rounded-lg shadow-md mb-4 p-6 flex flex-col sm:flex-row items-center border border-gray-200 transition-shadow duration-200 hover:shadow-lg">
+                    <div class="flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-800">@vacancy.Position</h3>
+                        <p class="mt-2 text-gray-600"><strong>Company:</strong> @vacancy.Company</p>
+                        <p class="mt-1 text-gray-600"><strong>Salary:</strong> @vacancy.Money</p>
+                        <p class="mt-1 text-gray-600"><strong>Status:</strong> @vacancy.State</p>
+                        <p class="mt-1 text-gray-600"><strong>Account Division:</strong> @vacancy.Account_Division</p>
+                    </div>
+                    <div class="mt-4 sm:mt-0">
+                        <a href="@Url.Action("Details", "Vacancies", new { id = vacancy.Id })" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                            Read More
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-gray-500">No administrative vacancies available.</p>
+        }
+    </div>
+
+    <div id="academicContent" class="tab-content hidden">
+        @if (academicVacancies.Any())
+        {
+            @foreach (var vacancy in academicVacancies)
+            {
+                <div class="w-full bg-gray-50 rounded-lg shadow-md mb-4 p-6 flex flex-col sm:flex-row items-center border border-gray-200 transition-shadow duration-200 hover:shadow-lg">
+                    <div class="flex-grow">
+                        <h3 class="text-2xl font-bold text-gray-800">@vacancy.Position</h3>
+                        <p class="mt-2 text-gray-600"><strong>Company:</strong> @vacancy.Company</p>
+                        <p class="mt-1 text-gray-600"><strong>Salary:</strong> @vacancy.Money</p>
+                        <p class="mt-1 text-gray-600"><strong>Status:</strong> @vacancy.State</p>
+                        <p class="mt-1 text-gray-600"><strong>Account Division:</strong> @vacancy.Account_Division</p>
+                    </div>
+                    <div class="mt-4 sm:mt-0">
+                        <a href="@Url.Action("Details", "Vacancies", new { id = vacancy.Id })" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded">
+                            Read More
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-center text-gray-500">No academic vacancies available.</p>
+        }
+    </div>
+</div>
+
+<script>
+    // Helper function: get URL parameter by name
+    function getParameterByName(name, url = window.location.href) {
+        name = name.replace(/[\[\]]/g, '\\$&');
+        var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    // Function to set the active tab and update URL
+    function setActiveTab(tabName) {
+        if (tabName === "academic") {
+            document.getElementById("academicContent").classList.remove("hidden");
+            document.getElementById("adminContent").classList.add("hidden");
+            document.getElementById("academicTab").classList.add("border-blue-600", "text-blue-600");
+            document.getElementById("adminTab").classList.remove("border-blue-600", "text-blue-600");
+            document.getElementById("adminTab").classList.add("border-transparent", "text-gray-500");
+        } else {
+            // default is administrative
+            document.getElementById("adminContent").classList.remove("hidden");
+            document.getElementById("academicContent").classList.add("hidden");
+            document.getElementById("adminTab").classList.add("border-blue-600", "text-blue-600");
+            document.getElementById("academicTab").classList.remove("border-blue-600", "text-blue-600");
+            document.getElementById("academicTab").classList.add("border-transparent", "text-gray-500");
+        }
+        // Update the URL using History API
+        var url = new URL(window.location.href);
+        url.searchParams.set("tab", tabName);
+        history.replaceState(null, "", url);
+    }
+
+    // On page load, check the URL parameter "tab"
+    document.addEventListener("DOMContentLoaded", function () {
+        var tabParam = getParameterByName("tab");
+        if (tabParam === "academic") {
+            setActiveTab("academic");
+        } else {
+            setActiveTab("administrative");
+        }
+    });
+
+    // Add click events for tab buttons
+    document.getElementById("adminTab").addEventListener("click", function (e) {
+        e.preventDefault();
+        setActiveTab("administrative");
+    });
+    document.getElementById("academicTab").addEventListener("click", function (e) {
+        e.preventDefault();
+        setActiveTab("academic");
+    });
+</script>
+@* <div class="container mt-4">
     <h2 class="text-center mb-4">Vacancies</h2>
     <div class="row">
         @foreach (var vacancy in Model.Vacancies)
@@ -15,6 +143,8 @@
                         <p class="card-text"><strong>Company:</strong> @vacancy.Company</p>
                         <p class="card-text"><strong>Salary:</strong> @vacancy.Money</p>
                         <p class="card-text"><strong>Status:</strong> @vacancy.State</p>
+                        <p class="card-text"><strong>Account_Division:</strong> @vacancy.Account_Division</p>
+                        <p class="card-text"><strong>Account_Division:</strong> @vacancy.Additional_Fields_List</p>
                         <a href="@Url.Action("Details", "Vacancies", new { id = vacancy.Id })" class="btn btn-primary">Read More</a>
 
                     </div>
@@ -22,5 +152,5 @@
             </div>
         }
     </div>
-</div>
+</div> *@
 

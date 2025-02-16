@@ -19,7 +19,7 @@ namespace HuntFlowWIUT.Web.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile([FromQuery] int accountId, IFormFile file)
+        public async Task<IActionResult> UploadFile([FromQuery] int accountId, IFormFile file, [FromQuery] bool isPhoto = false)
         {
             if (file == null || file.Length == 0)
             {
@@ -41,9 +41,15 @@ namespace HuntFlowWIUT.Web.Controllers
             {
                 Content = formData
             };
-
+            if (!isPhoto)
+            {
+                requestMessage.Headers.Add("X-File-Parse", "true");
+            } else
+            {
+                requestMessage.Headers.Add("X-File-Parse", "false");
+                //formData.Add(new StringContent("photo"), "preset");
+            }
             // Add required headers
-            requestMessage.Headers.Add("X-File-Parse", "true");
             // Optionally, add an Authorization header if needed:
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "8bd848677a936963960c5b88b78100d76e1dfc494476f320d7ce2344b5ab71c9");
 
@@ -57,5 +63,7 @@ namespace HuntFlowWIUT.Web.Controllers
             var responseContent = await response.Content.ReadAsStringAsync();
             return Content(responseContent, "application/json");
         }
+
+     
     }
 }
