@@ -399,9 +399,32 @@ namespace HuntFlowWIUT.Web.Controllers
                 // Return the view so user can correct the errors
                 return View(model);
             }
+            // Ensure model.Externals is initialized.
+            if (model.Externals == null || model.Externals.Count == 0)
+            {
+                model.Externals = new List<ExternalResumeViewModel>
+        {
+            new ExternalResumeViewModel { Data = new ResumeDataViewModel() }
+        };
+            }
+            else if (model.Externals[0].Data == null)
+            {
+                model.Externals[0].Data = new ResumeDataViewModel();
+            }
+
+            // Remove any Social entries with null/empty Value.
+            if (model.Social == null)
+            {
+                model.Social = new List<SocialAccountViewModel>();
+            }
+            else
+            {
+                model.Social = model.Social.Where(s => !string.IsNullOrWhiteSpace(s.Value)).ToList();
+            }
 
             // Set the submission date to now
             model.SubmissionDate = DateTime.Now;
+            model.Externals[0].Data.Body = model.MergedApplicationData;
 
             // Call your service to create the applicant (assuming it can handle the type2 model)
             var applicant = await _huntflowService.CreateAcademicApplicantAsync(_accountId, model);

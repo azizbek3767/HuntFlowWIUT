@@ -465,12 +465,6 @@
  *@
 
 <script type="text/javascript">
-    $(document).ready(function () {
-        $("#applicationForm").on("submit", function (e) {
-            console.log("Form submit event fired");
-            // Remove e.preventDefault() if present to allow the form to submit.
-        });
-    });
     // Initialize Flatpickr for all date inputs
     flatpickr("input.datepicker", { dateFormat: "Y-m-d" });
 

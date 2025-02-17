@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.WebUtilities;
 using System.Net.Http.Headers;
 using System.Text.Json;
 using static HuntFlowWIUT.Web.Services.Interfaces.IHuntFlowService;
-
 namespace HuntFlowWIUT.Web.Services
 {
     public class HuntflowService : IHuntflowService
@@ -143,6 +142,7 @@ namespace HuntFlowWIUT.Web.Services
                 position = model.Position,
                 company = "Company",
                 photo = model.Photo,
+                birthday = "2000-07-18",
                 externals = model.Externals.Select(e => new
                 {
                     auth_type = e.AuthType,
