@@ -122,5 +122,65 @@ namespace HuntFlowWIUT.Web.Services
             var responseContent = await response.Content.ReadAsStringAsync();
             return JsonSerializer.Deserialize<ApplicantDetail>(responseContent, _jsonOptions);
         }
+
+        public async Task<ApplicantDetail> CreateAcademicApplicantAsync(int accountId, ApplicantCreationAcademicViewModel model)
+        {
+            var accessToken = await _tokenService.GetAccessTokenAsync();
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var endpoint = $"accounts/{accountId}/applicants";
+
+
+            //Rebuild the payload with only the required properties.
+            var payload = new
+            {
+                first_name = model.FirstName,
+                last_name = model.LastName,
+                middle_name = "Middle Name",
+                money = 0,
+                phone = model.Phone,
+                email = model.Email,
+                skype = "Skype",
+                position = model.Position,
+                company = "Company",
+                photo = model.Photo,
+                externals = model.Externals.Select(e => new
+                {
+                    auth_type = e.AuthType,
+                    account_source = e.AccountSource,
+                    data = new { body = e.Data.Body ?? ""},
+                    files = e.Files
+                }),
+                social = model.Social.Select(s => new
+                {
+                    social_type = s.SocialType,
+                    value = s.Value
+                })
+            };
+
+
+            string jsonPayload = JsonSerializer.Serialize(payload, _jsonOptions);
+            _logger.LogInformation("Payload JSON: {jsonPayload}", jsonPayload);
+
+
+            // Create content and post it
+            using var content = new StringContent(jsonPayload, System.Text.Encoding.UTF8, "application/json");
+            using var response = await _httpClient.PostAsync(endpoint, content);
+            _logger.LogInformation("Response: ---------------------------------------------------------------", response);
+            // Log the JSON request body
+            string jsonRequestBody = JsonSerializer.Serialize(model, _jsonOptions);
+            _logger.LogInformation("Request JSON: {json}", jsonRequestBody);
+
+            // Serialize the model to JSON so you can inspect it
+            string jsonRequestBody2 = JsonSerializer.Serialize(model, _jsonOptions);
+            //using var response = await _httpClient.PostAsJsonAsync(endpoint, model, _jsonOptions);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException($"Error creating applicant. Status Code: {response.StatusCode}. Response: {errorContent}");
+            }
+            var responseContent = await response.Content.ReadAsStringAsync();
+            return JsonSerializer.Deserialize<ApplicantDetail>(responseContent, _jsonOptions);
+        }
     }
 }

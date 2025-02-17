@@ -9,324 +9,342 @@
     var authToken = ViewBag.AuthToken ?? "8bd848677a936963960c5b88b78100d76e1dfc494476f320d7ce2344b5ab71c9";
 }
 
-<h2>Application Form</h2>
-<!-- Display global validation summary -->
-@Html.ValidationSummary(true, "", new { @class = "text-danger" })
+<div class="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg">
+    <h2 class="text-3xl font-bold text-center mb-6">Application Form</h2>
 
-@if (ViewBag.ErrorList != null)
-{
-    <div class="alert alert-danger">
-        <ul>
-            @foreach (var error in ViewBag.ErrorList as List<string>)
-            {
-                <li>@error</li>
-            }
-        </ul>
-    </div>
-}
+    <!-- Display global validation summary -->
+    @Html.ValidationSummary(true, "", new { @class = "text-red-600 mb-4" })
 
-<!-- Optionally, display a TempData error message if present -->
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
-}
-<form asp-action="Apply" method="post" enctype="multipart/form-data" id="applicationForm">
-    <div class="form-group">
-        <label>Resume Upload (PDF file)</label>
-        <input type="file" id="resumeUpload" name="ResumeFile" class="form-control" accept=".pdf" />
-        <span asp-validation-for="ResumeFile" class="text-danger"></span>
-    </div>
-    <!-- Basic Info Section -->
-    <div class="form-group">
-        <label>Position applied for*</label>
-        <input asp-for="Position" class="form-control" readonly />
-        <span asp-validation-for="Position" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>First Name*</label>
-        <input asp-for="FirstName" class="form-control" />
-        <span asp-validation-for="FirstName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Last Name*</label>
-        <input asp-for="LastName" class="form-control" />
-        <span asp-validation-for="LastName" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Date of birth*</label>
-        <input asp-for="Birthday" type="date" class="form-control" />
-        <span asp-validation-for="Birthday" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Place of birth*</label>
-        <input asp-for="PlaceOfBirth" class="form-control" />
-        <span asp-validation-for="PlaceOfBirth" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Citizenship*</label>
-        <select asp-for="CitizenshipId" class="form-control" asp-items="Model.Countries">
-            <option value="">Select a country</option>
-        </select>
-        <span asp-validation-for="CitizenshipId" class="text-danger"></span>
-    </div>
+    @if (ViewBag.ErrorList != null)
+    {
+        <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+            <ul>
+                @foreach (var error in ViewBag.ErrorList as List<string>)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </div>
+    }
 
-    <div class="form-group">
-        <label>Contact telephone numbers*</label>
-        <input asp-for="Phone" class="form-control" />
-        <span asp-validation-for="Phone" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>E-mail Address*</label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Photo Upload (image file)</label>
-        <input type="file" id="photoUpload" name="PhotoFile" class="form-control" accept="image/*" />
-        <span asp-validation-for="PhotoFile" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>How did you hear about this vacancy?</label>
-        <input asp-for="HowDidYouHear" class="form-control" />
-        <span asp-validation-for="HowDidYouHear" class="text-danger"></span>
-    </div>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">@TempData["ErrorMessage"]</div>
+    }
 
-    <div class="form-group">
-        <label>Social networking profiles (if applicable):</label>
-        <input asp-for="SocialProfiles" class="form-control" />
-        <span asp-validation-for="SocialProfiles" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Have you ever been convicted of a crime?*</label>
-        <select asp-for="Convicted" class="form-control">
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-        </select>
-        <span asp-validation-for="Convicted" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Are you currently working at WIUT?*</label>
-        <select asp-for="CurrentlyWorkingAtWIUT" class="form-control">
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-        </select>
-        <span asp-validation-for="CurrentlyWorkingAtWIUT" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Have you applied for any position at WIUT before?*</label>
-        <select asp-for="AppliedBeforeAtWIUT" class="form-control">
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-        </select>
-        <span asp-validation-for="AppliedBeforeAtWIUT" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Do you have relatives who are currently employed at WIUT?*</label>
-        <select asp-for="HasRelativesAtWIUT" class="form-control">
-            <option value="false">No</option>
-            <option value="true">Yes</option>
-        </select>
-        <span asp-validation-for="HasRelativesAtWIUT" class="text-danger"></span>
-    </div>
+    <form asp-action="Apply" method="post" enctype="multipart/form-data" id="applicationForm" class="space-y-6">
+        <!-- Resume Upload -->
+        <div>
+            <label class="block text-lg font-semibold text-gray-700 mb-2">Resume Upload (PDF file)</label>
+            <input type="file" id="resumeUpload" name="ResumeFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept=".pdf" />
+            <span asp-validation-for="ResumeFile" class="text-red-600"></span>
+        </div>
+        <!-- Hidden field for Resume file ID -->
+        <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="" />
 
-    <!-- Employment Section -->
-    <hr />
-    <h3>Employment Section</h3>
-    <div id="employmentSection">
-        <div class="employment-block card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Employment 1</h5>
-                <div class="form-group">
-                    <label>From date</label>
-                    <input type="text" name="EmploymentBlocks[0].FromDate" class="form-control datepicker" />
+        <!-- Basic Info Section -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Position applied for*</label>
+                <input asp-for="Position" class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 cursor-not-allowed" readonly />
+                <span asp-validation-for="Position" class="text-red-600"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">First Name*</label>
+                    <input asp-for="FirstName" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="FirstName" class="text-red-600"></span>
                 </div>
-                <div class="form-group">
-                    <label>To date</label>
-                    <input type="text" name="EmploymentBlocks[0].ToDate" class="form-control datepicker" />
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Last Name*</label>
+                    <input asp-for="LastName" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="LastName" class="text-red-600"></span>
                 </div>
-                <div class="form-group">
-                    <label>Full or Part Time</label>
-                    <select name="EmploymentBlocks[0].FullOrPartTime" class="form-control">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Date of birth*</label>
+                    <input asp-for="Birthday" type="text" class="datepicker w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="Birthday" class="text-red-600"></span>
+                </div>
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Place of birth*</label>
+                    <input asp-for="PlaceOfBirth" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="PlaceOfBirth" class="text-red-600"></span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Citizenship*</label>
+                <select asp-for="CitizenshipId" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" asp-items="Model.Countries">
+                    <option value="">Select a country</option>
+                </select>
+                <span asp-validation-for="CitizenshipId" class="text-red-600"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Contact telephone numbers*</label>
+                    <input asp-for="Phone" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="Phone" class="text-red-600"></span>
+                </div>
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">E-mail Address*</label>
+                    <input asp-for="Email" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                    <span asp-validation-for="Email" class="text-red-600"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Photo Upload -->
+        <div>
+            <label class="block text-lg font-semibold text-gray-700 mb-2">Photo Upload (image file)</label>
+            <input type="file" id="photoUpload" name="PhotoFile" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" accept="image/*" />
+            <span asp-validation-for="PhotoFile" class="text-red-600"></span>
+        </div>
+        <!-- Hidden field for Photo file ID -->
+        <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
+
+        <!-- Additional Fields -->
+        <div class="space-y-4">
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">How did you hear about this vacancy?</label>
+                <input asp-for="HowDidYouHear" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                <span asp-validation-for="HowDidYouHear" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Social networking profiles (if applicable):</label>
+                <input asp-for="SocialProfiles" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                <span asp-validation-for="SocialProfiles" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Have you ever been convicted of a crime?*</label>
+                <select asp-for="Convicted" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <span asp-validation-for="Convicted" class="text-red-600"></span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Are you currently working at WIUT?*</label>
+                    <select asp-for="CurrentlyWorkingAtWIUT" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                    <span asp-validation-for="CurrentlyWorkingAtWIUT" class="text-red-600"></span>
+                </div>
+                <div>
+                    <label class="block text-lg font-semibold text-gray-700 mb-2">Have you applied for any position at WIUT before?*</label>
+                    <select asp-for="AppliedBeforeAtWIUT" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                    <span asp-validation-for="AppliedBeforeAtWIUT" class="text-red-600"></span>
+                </div>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Do you have relatives who are currently employed at WIUT?*</label>
+                <select asp-for="HasRelativesAtWIUT" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500">
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                </select>
+                <span asp-validation-for="HasRelativesAtWIUT" class="text-red-600"></span>
+            </div>
+        </div>
+
+        <!-- Employment Section (Dynamic) -->
+        <hr class="my-6" />
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Employment Section</h3>
+        <div id="employmentSection">
+            <div class="employment-block bg-gray-50 rounded-lg shadow-sm p-4 mb-4">
+                <h5 class="card-title text-xl font-bold mb-2">Employment 1</h5>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">From date</label>
+                    <input type="text" name="EmploymentBlocks[0].FromDate" class="w-full px-3 py-2 border border-gray-300 rounded datepicker" />
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">To date</label>
+                    <input type="text" name="EmploymentBlocks[0].ToDate" class="w-full px-3 py-2 border border-gray-300 rounded datepicker" />
+                </div>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Full or Part Time</label>
+                    <select name="EmploymentBlocks[0].FullOrPartTime" class="w-full px-3 py-2 border border-gray-300 rounded">
                         <option value="Full">Full</option>
                         <option value="Part">Part</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Name of Employer (Institution)</label>
-                    <input type="text" name="EmploymentBlocks[0].EmployerName" class="form-control" />
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Name of Employer (Institution)</label>
+                    <input type="text" name="EmploymentBlocks[0].EmployerName" class="w-full px-3 py-2 border border-gray-300 rounded" />
                 </div>
-                <div class="form-group">
-                    <label>Position in Organisation</label>
-                    <input type="text" name="EmploymentBlocks[0].PositionInOrg" class="form-control" />
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Position in Organisation</label>
+                    <input type="text" name="EmploymentBlocks[0].PositionInOrg" class="w-full px-3 py-2 border border-gray-300 rounded" />
                 </div>
-                <div class="form-group">
-                    <label>Summary of main duties</label>
-                    <textarea name="EmploymentBlocks[0].MainDuties" class="form-control"></textarea>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Summary of main duties</label>
+                    <textarea name="EmploymentBlocks[0].MainDuties" class="w-full px-3 py-2 border border-gray-300 rounded"></textarea>
                 </div>
-                <div class="form-group">
-                    <label>Name and contacts of Supervisor</label>
-                    <input type="text" name="EmploymentBlocks[0].SupervisorInfo" class="form-control" />
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Name and contacts of Supervisor</label>
+                    <input type="text" name="EmploymentBlocks[0].SupervisorInfo" class="w-full px-3 py-2 border border-gray-300 rounded" />
                 </div>
-                <!-- No delete button for the first block -->
+                <!-- No delete button for first block -->
             </div>
         </div>
-    </div>
-    <button type="button" id="addEmployment" class="btn btn-secondary">Add more employment</button>
+        <button type="button" id="addEmployment" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Add more employment</button>
 
-    <!-- Supervisor contact checkbox -->
-    <div class="form-group form-check">
-        <input type="checkbox" asp-for="AllowSupervisorContact" class="form-check-input" />
-        <label asp-for="AllowSupervisorContact" class="form-check-label">
-            Please tick if you do not mind your supervisors to be contacted by HR Department as part of the reference check.
-        </label>
-    </div>
+        <!-- Supervisor Contact Checkbox -->
+        <div class="mt-6">
+            <div class="flex items-center">
+                <input type="checkbox" asp-for="AllowSupervisorContact" class="form-checkbox h-5 w-5 text-blue-600" />
+                <label asp-for="AllowSupervisorContact" class="ml-2 text-gray-700">Please tick if you do not mind your supervisors to be contacted by HR Department as part of the reference check.</label>
+            </div>
+        </div>
 
-    <!-- Education Section -->
-    <hr />
-    <h3>Education and Qualifications</h3>
-    <div id="educationSection">
-        <div class="education-block card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Education 1</h5>
-                <div class="form-group">
-                    <label>From date</label>
-                    <input type="text" name="EducationBlocks[0].FromDate" class="form-control datepicker" />
+        <!-- Education Section -->
+        <hr class="my-6" />
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Education and Qualifications</h3>
+        <div id="educationSection">
+            <div class="education-block bg-gray-50 rounded-lg shadow-sm p-4 mb-4">
+                <h5 class="card-title text-xl font-bold mb-2">Education 1</h5>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">From date</label>
+                    <input type="text" name="EducationBlocks[0].FromDate" class="w-full px-3 py-2 border border-gray-300 rounded datepicker" />
                 </div>
-                <div class="form-group">
-                    <label>To date</label>
-                    <input type="text" name="EducationBlocks[0].ToDate" class="form-control datepicker" />
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">To date</label>
+                    <input type="text" name="EducationBlocks[0].ToDate" class="w-full px-3 py-2 border border-gray-300 rounded datepicker" />
                 </div>
-                <div class="form-group">
-                    <label>Full or Part Time</label>
-                    <select name="EducationBlocks[0].FullOrPartTime" class="form-control">
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Full or Part Time</label>
+                    <select name="EducationBlocks[0].FullOrPartTime" class="w-full px-3 py-2 border border-gray-300 rounded">
                         <option value="Full">Full</option>
                         <option value="Part">Part</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label>Name of Institution, place and country</label>
-                    <input type="text" name="EducationBlocks[0].InstitutionInfo" class="form-control" />
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Name of Institution, place and country</label>
+                    <input type="text" name="EducationBlocks[0].InstitutionInfo" class="w-full px-3 py-2 border border-gray-300 rounded" />
                 </div>
-                <div class="form-group">
-                    <label>Qualifications</label>
-                    <input type="text" name="EducationBlocks[0].Qualifications" class="form-control" />
-                </div>
-            </div>
-        </div>
-    </div>
-    <button type="button" id="addEducation" class="btn btn-secondary">Add more education</button>
-
-    <!-- Practical Training Section -->
-    <hr />
-    <h3>Practical Training</h3>
-    <div id="practicalTrainingSection">
-        <div class="practical-block card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Practical Training 1</h5>
-                <div class="form-group">
-                    <label>From date</label>
-                    <input type="text" name="PracticalTrainingBlocks[0].FromDate" class="form-control datepicker" />
-                </div>
-                <div class="form-group">
-                    <label>To date</label>
-                    <input type="text" name="PracticalTrainingBlocks[0].ToDate" class="form-control datepicker" />
-                </div>
-                <div class="form-group">
-                    <label>Name of Organisation</label>
-                    <input type="text" name="PracticalTrainingBlocks[0].OrganisationName" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label>Qualification / Certification</label>
-                    <input type="text" name="PracticalTrainingBlocks[0].Certification" class="form-control" />
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Qualifications</label>
+                    <input type="text" name="EducationBlocks[0].Qualifications" class="w-full px-3 py-2 border border-gray-300 rounded" />
                 </div>
             </div>
         </div>
-    </div>
-    <button type="button" id="addPracticalTraining" class="btn btn-secondary">Add more practical training</button>
+        <button type="button" id="addEducation" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Add more education</button>
 
-    <!-- Languages Section -->
-    <hr />
-    <h3>Languages</h3>
-    <div id="languageSection">
-        <div class="language-block card mb-3">
-            <div class="card-body">
-                <h5 class="card-title">Language 1</h5>
-                <div class="form-group">
-                    <label>Language name</label>
-                    <input type="text" name="LanguageBlocks[0].LanguageName" class="form-control" />
+        <!-- Practical Training Section -->
+        <hr class="my-6" />
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Practical Training</h3>
+        <div id="practicalTrainingSection">
+            <div class="practical-block bg-gray-50 rounded-lg shadow-sm p-4 mb-4">
+                <h5 class="card-title text-xl font-bold mb-2">Practical Training 1</h5>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">From date</label>
+                    <input type="text" name="PracticalTrainingBlocks[0].FromDate" class="w-full px-3 py-2 border border-gray-300 rounded datepicker" />
                 </div>
-                <div class="form-group">
-                    <label>Reading (1-5)</label>
-                    <select name="LanguageBlocks[0].Reading" class="form-control">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <option value="@i">@i</option>
-                        }
-                    </select>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">To date</label>
+                    <input type="text" name="PracticalTrainingBlocks[0].ToDate" class="w-full px-3 py-2 border border-gray-300 rounded datepicker" />
                 </div>
-                <div class="form-group">
-                    <label>Writing (1-5)</label>
-                    <select name="LanguageBlocks[0].Writing" class="form-control">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <option value="@i">@i</option>
-                        }
-                    </select>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Name of Organisation</label>
+                    <input type="text" name="PracticalTrainingBlocks[0].OrganisationName" class="w-full px-3 py-2 border border-gray-300 rounded" />
                 </div>
-                <div class="form-group">
-                    <label>Speaking (1-5)</label>
-                    <select name="LanguageBlocks[0].Speaking" class="form-control">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <option value="@i">@i</option>
-                        }
-                    </select>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-1">Qualification / Certification</label>
+                    <input type="text" name="PracticalTrainingBlocks[0].Certification" class="w-full px-3 py-2 border border-gray-300 rounded" />
                 </div>
             </div>
         </div>
-    </div>
-    <button type="button" id="addLanguage" class="btn btn-secondary">Add more languages</button>
+        <button type="button" id="addPracticalTraining" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Add more practical training</button>
 
-    <!-- Additional Fields -->
-    <hr />
+        <!-- Languages Section -->
+        <hr class="my-6" />
+        <h3 class="text-2xl font-semibold text-gray-700 mb-4">Languages</h3>
+        <div id="languageSection">
+            <div class="language-block bg-gray-50 rounded-lg shadow-sm p-4 mb-4">
+                <h5 class="card-title text-xl font-bold mb-2">Language 1</h5>
+                <div class="mb-2">
+                    <label class="block text-gray-700 font-medium mb-1">Language name</label>
+                    <input type="text" name="LanguageBlocks[0].LanguageName" class="w-full px-3 py-2 border border-gray-300 rounded" />
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Reading (1-5)</label>
+                        <select name="LanguageBlocks[0].Reading" class="w-full px-3 py-2 border border-gray-300 rounded">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Writing (1-5)</label>
+                        <select name="LanguageBlocks[0].Writing" class="w-full px-3 py-2 border border-gray-300 rounded">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Speaking (1-5)</label>
+                        <select name="LanguageBlocks[0].Speaking" class="w-full px-3 py-2 border border-gray-300 rounded">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <option value="@i">@i</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button type="button" id="addLanguage" class="w-full bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">Add more languages</button>
 
-    <div class="form-group">
-        <label>What is your motivation to join us?</label>
-        <textarea asp-for="Motivation" class="form-control"></textarea>
-        <span asp-validation-for="Motivation" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>What specific skills do you possess that are relevant for the position?</label>
-        <textarea asp-for="SpecificSkills" class="form-control"></textarea>
-        <span asp-validation-for="SpecificSkills" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label>Is there anything else you’d like to share to support your application?</label>
-        <textarea asp-for="AdditionalInfo" class="form-control"></textarea>
-        <span asp-validation-for="AdditionalInfo" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label for="socialProfile">Social networking profiles (if applicable):</label>
-        <input type="text" id="socialProfile" name="Social[0].Value" class="form-control" />
-        <span asp-validation-for="Social[0].Value" class="text-danger"></span>
-    </div>
-    <div class="form-group form-check">
-        <input type="checkbox" asp-for="Declaration" class="form-check-input" />
-        <label asp-for="Declaration" class="form-check-label">I declare that the information provided on this application form is true and correct to the best of my knowledge.</label>
-        <span asp-validation-for="Declaration" class="text-danger"></span>
-    </div>
-    <input type="hidden" asp-for="SubmissionDate" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+        <!-- Additional Fields -->
+        <hr class="my-6" />
+        <div class="space-y-4">
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">What is your motivation to join us?</label>
+                <textarea asp-for="Motivation" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500"></textarea>
+                <span asp-validation-for="Motivation" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">What specific skills do you possess that are relevant for the position?</label>
+                <textarea asp-for="SpecificSkills" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500"></textarea>
+                <span asp-validation-for="SpecificSkills" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2">Is there anything else you’d like to share to support your application?</label>
+                <textarea asp-for="AdditionalInfo" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500"></textarea>
+                <span asp-validation-for="AdditionalInfo" class="text-red-600"></span>
+            </div>
+            <div>
+                <label class="block text-lg font-semibold text-gray-700 mb-2" for="socialProfile">Social networking profiles (if applicable):</label>
+                <input type="text" id="socialProfile" name="Social[0].Value" class="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring focus:border-blue-500" />
+                <span asp-validation-for="Social[0].Value" class="text-red-600"></span>
+            </div>
+        </div>
 
-    <!-- Hidden fields for merged data and external resume -->
-    <!-- MergedApplicationData will be computed by JS and set into Externals[0].Data.Body -->
-    <input type="hidden" asp-for="MergedApplicationData" id="MergedDataHidden" />
-    <!-- External resume file ID from resume upload -->
-    <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="" />
-    <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
+        <!-- Declaration and Submission Date -->
+        <hr class="my-6" />
+        <div class="flex items-center">
+            <input type="checkbox" asp-for="Declaration" class="form-checkbox h-5 w-5 text-blue-600" />
+            <label asp-for="Declaration" class="ml-2 text-gray-700">I declare that the information provided on this application form is true and correct to the best of my knowledge.</label>
+            <span asp-validation-for="Declaration" class="text-red-600"></span>
+        </div>
+        <input type="hidden" asp-for="SubmissionDate" value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm:ss")" />
 
-    <button type="submit" class="btn btn-primary">Submit Application</button>
-</form>
+        <!-- Hidden fields for merged data and external resume -->
+        <input type="hidden" asp-for="MergedApplicationData" id="MergedDataHidden" />
+        <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="0" />
+        <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
 
+        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded">Submit Application</button>
+    </form>
+</div>
 <!-- Include jQuery and toastr JS (if not already included in your layout) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -476,7 +494,7 @@
 
             // Append a delete button if not present
             if (!newBlock.find(".deleteEmployment").length) {
-                newBlock.append('<button type="button" class="btn btn-danger deleteEmployment">Delete</button>');
+                newBlock.append('<button type="button" class="deleteEmployment mt-4 inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>');
             }
 
             // Append the block
@@ -516,7 +534,7 @@
             });
             newBlock.find(".card-title").text("Education " + (educationCount + 1));
             if (!newBlock.find(".deleteEducation").length) {
-                newBlock.append('<button type="button" class="btn btn-danger deleteEducation">Delete</button>');
+                newBlock.append('<button type="button" class="deleteEducation inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>');
             }
             $("#educationSection").append(newBlock);
             newBlock.find("input.datepicker").each(function () {
@@ -548,7 +566,7 @@
             });
             newBlock.find(".card-title").text("Practical Training " + (practicalCount + 1));
             if (!newBlock.find(".deletePractical").length) {
-                newBlock.append('<button type="button" class="btn btn-danger deletePractical">Delete</button>');
+                newBlock.append('<button type="button" class="deletePractical inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>');
             }
             $("#practicalTrainingSection").append(newBlock);
             newBlock.find("input.datepicker").each(function () {
@@ -580,7 +598,7 @@
             });
             newBlock.find(".card-title").text("Language " + (languageCount + 1));
             if (!newBlock.find(".deleteLanguage").length) {
-                newBlock.append('<button type="button" class="btn btn-danger deleteLanguage">Delete</button>');
+                newBlock.append('<button type="button" class="deleteLanguage inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">Delete</button>');
             }
             $("#languageSection").append(newBlock);
             languageCount++;

@@ -361,7 +361,54 @@ namespace HuntFlowWIUT.Web.Controllers
         }
 
 
+        [HttpPost]
+        public async Task<IActionResult> ApplyAcademic(int id, ApplicantCreationAcademicViewModel model)
+        {
+            // Ensure at least one degree is selected.
+            if (model.Degrees == null || model.Degrees.Count == 0)
+            {
+                ModelState.AddModelError("Degrees", "Please select at least one degree.");
+            }
+            // Additional validations can be added here as needed
 
+            if (!ModelState.IsValid)
+            {
+                // Repopulate the Countries dropdown
+                var countries = await _countryService.GetCountriesAsync();
+                var defaultCountry = countries.FirstOrDefault(c =>
+                    c.Name.Equals("Uzbekistan", StringComparison.OrdinalIgnoreCase));
+                int? defaultCountryId = defaultCountry?.Id;
+                model.Countries = new SelectList(countries, "Id", "Name", defaultCountryId);
+                model.CitizenshipId = defaultCountryId ?? 0;
+
+                // Set additional ViewBag values
+                ViewBag.AccountId = _accountId;
+                ViewBag.AuthToken = _configuration["Huntflow:AccessToken"];
+
+                // Build an error list for display
+                var errorList = new List<string>();
+                foreach (var key in ModelState.Keys)
+                {
+                    foreach (var error in ModelState[key].Errors)
+                    {
+                        errorList.Add($"Error in {key}: {error.ErrorMessage}");
+                    }
+                }
+                ViewBag.ErrorList = errorList;
+
+                // Return the view so user can correct the errors
+                return View(model);
+            }
+
+            // Set the submission date to now
+            model.SubmissionDate = DateTime.Now;
+
+            // Call your service to create the applicant (assuming it can handle the type2 model)
+            var applicant = await _huntflowService.CreateAcademicApplicantAsync(_accountId, model);
+
+            TempData["SuccessMessage"] = "Your application was submitted successfully!";
+            return RedirectToAction("Details", new { id = id });
+        }
 
         // POST: /Vacancies/Apply/{id}
         /*[HttpPost]

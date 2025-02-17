@@ -12,7 +12,6 @@ namespace HuntFlowWIUT.Web.Models.ViewModels
         public string Position { get; set; }
 
         // 2. Area Of Interest
-        [JsonPropertyName("area_of_interest")]
         public string AreaOfInterest { get; set; } = "";
 
         // 3. First Name* (required)
@@ -32,7 +31,6 @@ namespace HuntFlowWIUT.Web.Models.ViewModels
 
         // 6. Citizenship* (required) – expects a country id
         [Required]
-        [JsonPropertyName("citizenship_id")]
         public int CitizenshipId { get; set; }
 
         // 7. E-mail Address* (required)
@@ -48,7 +46,6 @@ namespace HuntFlowWIUT.Web.Models.ViewModels
         public int Photo { get; set; }
 
         // 9. Research IDs block (optional)
-        [JsonPropertyName("research_ids")]
         public ResearchIds ResearchIds { get; set; } = new ResearchIds();
 
         // 10. Degrees (required) – a list of selected degrees; at least one required.
@@ -58,24 +55,19 @@ namespace HuntFlowWIUT.Web.Models.ViewModels
 
         // 11. How did you hear about this vacancy?* (required) and detail
         [Required]
-        [JsonPropertyName("how_did_you_hear")]
         public string HowDidYouHear { get; set; }
-        [JsonPropertyName("how_did_you_hear_detail")]
-        public string HowDidYouHearDetail { get; set; } = "";
+        public string? HowDidYouHearDetail { get; set; } = "";
 
         // 12. Are you currently in Uzbekistan?* (required)
         [Required]
-        [JsonPropertyName("currently_in_uzbekistan")]
         public bool CurrentlyInUzbekistan { get; set; }
 
         // 13. Have you applied for any position at WIUT before?* (required)
         [Required]
-        [JsonPropertyName("applied_before_at_wiut")]
         public bool AppliedBeforeAtWIUT { get; set; }
 
         // 14. Have you ever worked at WIUT?* (required)
         [Required]
-        [JsonPropertyName("ever_worked_at_wiut")]
         public bool EverWorkedAtWIUT { get; set; }
 
         // 15. Do you have relatives who are currently employed at WIUT?* (required)
@@ -97,57 +89,57 @@ namespace HuntFlowWIUT.Web.Models.ViewModels
         // File attachments (section "Please upload your files below:") – each file is represented by an IFormFile property (ignored in JSON)
         // and an integer property that will be sent in JSON.
         [JsonIgnore]
-        public IFormFile CoverLetterFile { get; set; }
+        public IFormFile? CoverLetterFile { get; set; }
         [JsonPropertyName("cover_letter")]
         public int CoverLetter { get; set; }
 
         [JsonIgnore]
-        public IFormFile CvFile { get; set; }
+        public IFormFile? CvFile { get; set; }
         [JsonPropertyName("cv")]
         public int Cv { get; set; }
 
         [JsonIgnore]
-        public IFormFile EvaluationReportFile { get; set; }
+        public IFormFile? EvaluationReportFile { get; set; }
         [JsonPropertyName("evaluation_report")]
         public int EvaluationReport { get; set; }
 
         [JsonIgnore]
-        public IFormFile VisionFile { get; set; }
+        public IFormFile? VisionFile { get; set; }
         [JsonPropertyName("vision")]
         public int Vision { get; set; }
 
         [JsonIgnore]
-        public IFormFile TeachingPortfolioFile { get; set; }
+        public IFormFile? TeachingPortfolioFile { get; set; }
         [JsonPropertyName("teaching_portfolio")]
         public int TeachingPortfolio { get; set; }
 
         [JsonIgnore]
-        public IFormFile ResearchStatementFile { get; set; }
+        public IFormFile? ResearchStatementFile { get; set; }
         [JsonPropertyName("research_statement")]
         public int ResearchStatement { get; set; }
 
         [JsonIgnore]
-        public IFormFile DissertationFile { get; set; }
+        public IFormFile? DissertationFile { get; set; }
         [JsonPropertyName("dissertation")]
         public int Dissertation { get; set; }
 
         [JsonIgnore]
-        public IFormFile DiplomasFile { get; set; }
+        public IFormFile? DiplomasFile { get; set; }
         [JsonPropertyName("diplomas")]
         public int Diplomas { get; set; }
 
         [JsonIgnore]
-        public IFormFile TranscriptsFile { get; set; }
+        public IFormFile? TranscriptsFile { get; set; }
         [JsonPropertyName("transcripts")]
         public int Transcripts { get; set; }
 
         [JsonIgnore]
-        public IFormFile EnglishCertificateFile { get; set; }
+        public IFormFile? EnglishCertificateFile { get; set; }
         [JsonPropertyName("english_certificate")]
         public int EnglishCertificate { get; set; }
 
         [JsonIgnore]
-        public IFormFile ReferencesFile { get; set; }
+        public IFormFile? ReferencesFile { get; set; }
         [JsonPropertyName("references")]
         public int References { get; set; }
 
@@ -164,7 +156,7 @@ namespace HuntFlowWIUT.Web.Models.ViewModels
 
         // Optional: Countries list for dropdown binding (not sent in JSON)
         [JsonIgnore]
-        public IEnumerable<SelectListItem> Countries { get; set; }
+        public IEnumerable<SelectListItem>? Countries { get; set; }
 
         // The external resume block that stores the merged data and resume file ID.
         [JsonPropertyName("externals")]

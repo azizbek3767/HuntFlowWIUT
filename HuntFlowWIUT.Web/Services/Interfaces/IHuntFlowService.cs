@@ -10,6 +10,7 @@ namespace HuntFlowWIUT.Web.Services.Interfaces
             Task<Models.VacancyListResponse> GetVacanciesAsync(int accountId, int page = 1, int count = 30);
             Task<Models.VacancyDetail> GetVacancyDetailAsync(int accountId, int vacancyId);
             Task<ApplicantDetail> CreateApplicantAsync(int accountId, ApplicantCreationViewModel model);
+            Task<ApplicantDetail> CreateAcademicApplicantAsync(int accountId, ApplicantCreationAcademicViewModel model);
         }
 
 
