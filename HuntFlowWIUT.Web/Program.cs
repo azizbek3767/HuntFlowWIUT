@@ -1,10 +1,5 @@
-using HuntFlowWIUT.Web.Controllers;
-using HuntFlowWIUT.Web.Extensions;
 using HuntFlowWIUT.Web.Services;
 using HuntFlowWIUT.Web.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using static HuntFlowWIUT.Web.Services.Interfaces.IHuntFlowService;
 using NLog.Web;
 

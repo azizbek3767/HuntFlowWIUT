@@ -6,7 +6,7 @@
     var countries = ViewBag.Countries as IEnumerable<SelectListItem>;
     //var countries = Model.Countries;
     var accountId = ViewBag.AccountId ?? "3360";
-    var authToken = ViewBag.AuthToken ?? "8bd848677a936963960c5b88b78100d76e1dfc494476f320d7ce2344b5ab71c9";
+    var authToken = ViewBag.AuthToken ?? "";
 }
 
 <div class="max-w-3xl mx-auto p-8 bg-white shadow-lg rounded-lg">
@@ -101,7 +101,6 @@
             <span asp-validation-for="PhotoFile" class="text-red-600"></span>
         </div>
         <!-- Hidden field for Photo file ID -->
-        <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
 
         <!-- Additional Fields -->
         <div class="space-y-4">
@@ -342,6 +341,7 @@
         <input type="hidden" id="ExternalFileId" name="Externals[0].Files[0]" value="0" />
         <input type="hidden" id="PhotoFileId" name="Photo" value="0" />
 
+
         <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded">Submit Application</button>
     </form>
 </div>
@@ -511,9 +511,6 @@
         employmentCount--;
     });
 
-   
-
-
     // Dynamic Add/Remove for Education Section
     var educationCount = 1;
     $("#addEducation").click(function () {
@@ -665,8 +662,6 @@
         });
     });
 
-
-
     // Merge form data into a single pretty printed string on form submit
     $("#applicationForm").on("submit", function () {
         console.log("Form submit event fired");
@@ -733,29 +728,4 @@
 
         $("#MergedDataHidden").val(merged);
     });
-
-
-
-     /* $("#addEmployment").click(function () {
-        if (employmentCount < 10) {
-            var newBlock = $(".employment-block").first().clone();
-            // Update names and clear values
-            newBlock.find("input, select, textarea").each(function () {
-                var name = $(this).attr("name");
-                if (name) {
-                    $(this).attr("name", name.replace("EmploymentBlocks[0]", "EmploymentBlocks[" + employmentCount + "]"));
-                }
-                $(this).val("");
-            });
-            // Update the header number in the cloned block:
-            newBlock.find(".card-title").text("Employment Block " + (employmentCount + 1));
-            // Append the new block
-            $("#employmentSection").append(newBlock);
-            // Reinitialize Flatpickr on any date inputs in the new block:
-            newBlock.find("input[type='date']").each(function () {
-                flatpickr(this, { dateFormat: "Y-m-d" });
-            });
-            employmentCount++;
-        }
-    }); */
 </script>

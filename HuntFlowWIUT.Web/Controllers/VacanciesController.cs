@@ -48,34 +48,6 @@ namespace HuntFlowWIUT.Web.Controllers
             return View(vacancyDetail);
         }
 
-        // GET: /Vacancies/Apply/{id}
-        /*[HttpGet]
-        public async Task<IActionResult> Apply(int id)
-        {
-            var vacancy = await _huntflowService.GetVacancyDetailAsync(_accountId, id);
-            if (vacancy == null)
-            {
-                return NotFound();
-            }
-
-            var model = new ApplicantCreationViewModel
-            {
-                Position = vacancy.Position,
-                Company = vacancy.Company,
-                Birthday = DateTime.Today
-            };
-
-            if (model.Externals == null || model.Externals.Count == 0)
-            {
-                model.Externals.Add(new ExternalResumeViewModel { Data = new ResumeDataViewModel() });
-            }
-            if (model.Social == null || model.Social.Count == 0)
-            {
-                model.Social.Add(new SocialAccountViewModel());
-            }
-
-            return View(model);
-        }*/
         
         [HttpGet]
         public async Task<IActionResult> Apply(int id)
@@ -432,55 +404,5 @@ namespace HuntFlowWIUT.Web.Controllers
             TempData["SuccessMessage"] = "Your application was submitted successfully!";
             return RedirectToAction("Details", new { id = id });
         }
-
-        // POST: /Vacancies/Apply/{id}
-        /*[HttpPost]
-        public async Task<IActionResult> Apply(int id, ApplicantCreationViewModel model)
-        {
-            if (model.Birthday == DateTime.MinValue)
-            {
-                ModelState.AddModelError("Birthday", "Please enter a valid birthday.");
-                return View(model);
-            }
-
-            *//*if (!ModelState.IsValid)
-            {
-                return View(model);
-            }*//*
-            
-            if (!ModelState.IsValid)
-            {
-                var countries = await _countryService.GetCountriesAsync();
-                var defaultCountry = countries.FirstOrDefault(c => c.Name.Equals("Uzbekistan", StringComparison.OrdinalIgnoreCase));
-                int? defaultCountryId = defaultCountry?.Id;
-                model.Countries = new SelectList(countries, "Id", "Name", defaultCountryId);
-                ViewBag.AccountId = _accountId;
-                ViewBag.AuthToken = _configuration["Huntflow:AccessToken"];
-                // Log ModelState errors (using Console.WriteLine for demonstration; replace with your logging mechanism)
-                foreach (var key in ModelState.Keys)
-                {
-                    var state = ModelState[key];
-                    foreach (var error in state.Errors)
-                    {
-                        Console.WriteLine($"Error in {key}: {error.ErrorMessage}");
-                    }
-                }
-                // Return the view with the model so that errors are displayed
-                return View(model);
-            }
-            // Ensure that the merged application data is set into the external resume block.
-            if (model.Externals.Count > 0)
-            {
-                model.Externals[0].Data.Body = model.MergedApplicationData; // The merged data from the hidden field.
-            }
-            // Set the submission date
-            model.SubmissionDate = DateTime.Now;
-
-            var applicant = await _huntflowService.CreateApplicantAsync(_accountId, model);
-
-            TempData["SuccessMessage"] = "Your application was submitted successfully!";
-
-            return RedirectToAction("Details", new { id = id });
-        }*/
     }
 }
